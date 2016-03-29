@@ -2,13 +2,17 @@
 set -e
 
 APP_ENV=${APP_ENV:-'local'}
-RANDOM_KEY=`openssl rand -base64 32`
+RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 
 if [ $APP_ENV == 'local' ]; then
   APP_DEBUG=true
-  adduser --system --uid=$(stat -c %u .) devuser
-  sed -i 's/User apache/User devuser/g' /etc/httpd/conf/httpd.conf
-  sed -i 's/Group apache/Group devuser/g' /etc/httpd/conf/httpd.conf
+  if getent passwd devuser > /dev/null 2>&1; then
+    echo 'User devuser is existed'
+  else
+    adduser --system --uid=$(stat -c %u .) devuser
+    sed -i 's/User apache/User devuser/g' /etc/httpd/conf/httpd.conf
+    sed -i 's/Group apache/Group devuser/g' /etc/httpd/conf/httpd.conf
+  fi
   chown root:devuser -R . && chmod 775 -R .
 else
   APP_DEBUG=false
@@ -37,3 +41,4 @@ fi
 
 echo "$@"
 exec "$@"
+
