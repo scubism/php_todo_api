@@ -14,5 +14,9 @@ class ExampleController extends Controller
         //
     }
 
+    public function index()
+    {
+        echo "Hello from Example Index";
+    }
     //
 }

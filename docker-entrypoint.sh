@@ -6,6 +6,7 @@ RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 
 if [ $APP_ENV == 'local' ]; then
   APP_DEBUG=true
+  HTTPD_STATE="BACKGROUD"
   if getent passwd devuser > /dev/null 2>&1; then
     echo 'User devuser is existed'
   else
@@ -16,6 +17,7 @@ if [ $APP_ENV == 'local' ]; then
   chown root:devuser -R . && chmod 775 -R .
 else
   APP_DEBUG=false
+  HTTPD_STATE="FOREGROUND"
   chown root:apache -R . && chmod 775 -R .
 fi
 
@@ -32,11 +34,9 @@ if [ ! -f ".env" ]; then
     > .env
 fi
 
-composer install
-
 if [ "$1" = '' ]; then
   rm -rf /run/httpd/* /tmp/httpd*
-  set -- /usr/sbin/apachectl -D FOREGROUND
+  set -- /usr/sbin/apachectl -D $HTTPD_STATE
 fi
 
 echo "$@"

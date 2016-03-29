@@ -12,5 +12,9 @@
 */
 
 $app->get('/', function () use ($app) {
-    return $app->version();
+    return 'Hello PHP TODO API';
+});
+
+$app->group(['prefix' => 'v2'], function () use ($app) {
+    $app->get('/index', 'App\Http\Controllers\ExampleController@index');
 });
