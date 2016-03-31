@@ -13,16 +13,16 @@ class AddTodosTable extends Migration
     public function up()
     {
         //
-	if (Schema::hasTable('todos')) {
+	    if (!Schema::hasTable('todos')) {
             Schema:create('todos', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('title',255);
-                $table->dateTime('duedate');
+                $table->dateTime('duedate')->nullable();
                 $table->string('color', 255);
                 $table->integer('group_id');
             });
         }
-	Schema::table('todos', function($table) {
+	    Schema::table('todos', function($table) {
             $table->dateTime('duedate')->nullable();
         });
     }
@@ -35,6 +35,6 @@ class AddTodosTable extends Migration
     public function down()
     {
         //
-	Schema::dropIfExists('todos');
+	    Schema::dropIfExists('todos');
     }
 }

@@ -13,7 +13,7 @@ class AddTodoGroupsTable extends Migration
     public function up()
     {
         //
-	if (Schema::hasTable('todo_groups')) {
+	    if (!Schema::hasTable('todo_groups')) {
             Schema:create('todo_groups', function (Blueprint $table) {
                 $table->increments('id');
                 $table->string('title',255);
@@ -29,6 +29,6 @@ class AddTodoGroupsTable extends Migration
     public function down()
     {
         //
-	Schema::dropIfExists('todo_groups');
+	    Schema::dropIfExists('todo_groups');
     }
 }
