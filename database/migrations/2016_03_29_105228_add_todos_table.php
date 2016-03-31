@@ -22,9 +22,6 @@ class AddTodosTable extends Migration
                 $table->integer('group_id');
             });
         }
-	    Schema::table('todos', function($table) {
-            $table->dateTime('duedate')->nullable();
-        });
     }
 
     /**
