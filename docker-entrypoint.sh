@@ -1,16 +1,31 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 ENV=${APP_ENV:-'local'}
 RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 
-if [ $ENV = 'local' ]; then
+if [ $ENV == 'local' ]; then
   APP_DEBUG=true
+  if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
+    sed -i "s/daemonize = no/daemonize = yes/g" /usr/local/etc/php-fpm.d/zz-docker.conf
+  fi
+  mkdir -p /var/log/php-fpm
+  touch /var/log/php-fpm/error.log
+  touch /var/log/php-fpm/access.log
+  if [ -f "/usr/local/etc/php-fpm.d/docker.conf" ]; then
+    sed -i "s/error_log = \/proc\/self\/fd\/2/error_log = \/var\/log\/php-fpm\/error.log/g" /usr/local/etc/php-fpm.d/docker.conf
+    sed -i "s/access.log = \/proc\/self\/fd\/2/access.log = \/var\/log\/php-fpm\/access.log/g" /usr/local/etc/php-fpm.d/docker.conf
+  fi
 else
   APP_DEBUG=false
+  if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
+    sed -i "s/daemonize = yes/daemonize = no/g" /usr/local/etc/php-fpm.d/zz-docker.conf
+  fi
+  if [ -f "/usr/local/etc/php-fpm.d/docker.conf" ]; then
+    sed -i "s/error_log = \/var\/log\/php-fpm\/error.log/error_log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
+    sed -i "s/access.log = \/var\/log\/php-fpm\/access.log/access.log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
+  fi
 fi
-
-chmod 775 -R /var/www/html
 
 if [ ! -f ".env" ]; then
   sed -e "s/DB_HOST=localhost/DB_HOST=${DB_HOST}/g" \
@@ -24,5 +39,9 @@ if [ ! -f ".env" ]; then
     < .env.example \
     > .env
 fi
+
+chmod 775 -R /var/www/html
+
+usermod -u 1000 www-data
 
 exec "php-fpm"
