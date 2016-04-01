@@ -5,6 +5,8 @@ use Illuminate\Database\Migrations\Migration;
 
 class AddTodosTable extends Migration
 {
+    private $tableName = 'todos';
+
     /**
      * Run the migrations.
      *
@@ -12,14 +14,15 @@ class AddTodosTable extends Migration
      */
     public function up()
     {
-        //
-	    if (!Schema::hasTable('todos')) {
-            Schema:create('todos', function (Blueprint $table) {
+        if (!Schema::hasTable($this->tableName)) {
+            Schema::create($this->tableName, function (Blueprint $table) {
                 $table->increments('id');
-                $table->string('title',255);
+                $table->string('title', 255);
                 $table->dateTime('duedate')->nullable();
-                $table->string('color', 255);
-                $table->integer('group_id');
+                $table->string('color', 255)->nullable();
+                $table->integer('todo_groups_id');
+                $table->softDeletes();
+                $table->timestamps();
             });
         }
     }
@@ -31,7 +34,6 @@ class AddTodosTable extends Migration
      */
     public function down()
     {
-        //
-	    Schema::dropIfExists('todos');
+        Schema::dropIfExists($this->tableName);
     }
 }

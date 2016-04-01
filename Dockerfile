@@ -1,8 +1,9 @@
 FROM php:7-fpm
 
 RUN apt-get update \
-    && apt-get install nano bash -y \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get install libmcrypt-dev nano bash -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && docker-php-ext-install pdo pdo_mysql mcrypt iconv mbstring
 
 COPY . /var/www/html
 
