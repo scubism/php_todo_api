@@ -38,25 +38,37 @@ class TodosController extends Controller
     {
         // TODO Check exist
         $todo = Todo::find($id);
-        return $todo;
+        if ($todo === NULL) {
+            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        } else {
+            return $todo;
+        }
     }
 
     public function createTodo(Request $request)
     {
         // TODO Check exist
-        $todo = new Todo;
+        // TODO Check parameter null
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'todo_groups_id' => 'required'
+        ]);
+        $todo = new Todo();
         $todo->title = $request->title;
-        $todo->duedate = $request->duedate;
         $todo->color = $request->color;
+        $todo->duedate = $request->duedate;
         $todo->todo_groups_id = $request->todo_groups_id;
-
         return $todo->save();
     }
 
     public function updateTodo($id, Request $request)
     {
         // TODO Check exist
+        // TODO Check parameter null
         $todo = Todo::find($id);
+        if ($todo === NULL) {
+            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        }
         $todo->update($request);
         return $todo;
     }
@@ -65,13 +77,19 @@ class TodosController extends Controller
     {
         // TODO Check exist
         $todo = Todo::find($id);
-        return $todo->delete();;
+        if ($todo === NULL) {
+            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        }
+        return $todo->delete();
     }
 
     public function moveTodo($id)
     {
         // TODO Implement this action
         $todo = Todo::find($id);
+        if ($todo === NULL) {
+            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        }
         return $todo;
     }
 }
