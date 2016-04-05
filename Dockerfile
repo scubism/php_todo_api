@@ -1,7 +1,7 @@
 FROM php:7-fpm
 
 RUN apt-get update \
-    && apt-get install libmcrypt-dev nano bash -y \
+    && apt-get install libmcrypt-dev nano bash git -y \
     && rm -rf /var/lib/apt/lists/* \
     && docker-php-ext-install pdo pdo_mysql mcrypt iconv mbstring
 
