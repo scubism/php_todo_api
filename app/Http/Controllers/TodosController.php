@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todo;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TodosController extends Controller
 {
     // TODO Add todos repository
+    // TODO Add Middleware to check todo exist
 
     /**
      * Create a new controller instance.
@@ -22,9 +24,9 @@ class TodosController extends Controller
     public function index()
     {
         $response = [
-            'message' => 'Hello from API Index'
+            'message' => 'Hello from API Index',
         ];
-        return $response;
+        return new JsonResponse($response, 200);
     }
 
     public function indexTodos()
@@ -38,8 +40,8 @@ class TodosController extends Controller
     {
         // TODO Check exist
         $todo = Todo::find($id);
-        if ($todo === NULL) {
-            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        if (!$todo) {
+            return new JsonResponse(['message' => 'Not found'], 404);
         } else {
             return $todo;
         }
@@ -51,7 +53,7 @@ class TodosController extends Controller
         // TODO Check parameter null
         $validator = Validator::make($request->all(), [
             'title' => 'required',
-            'todo_groups_id' => 'required'
+            'todo_groups_id' => 'required',
         ]);
         $todo = new Todo();
         $todo->title = $request->title;
@@ -66,8 +68,8 @@ class TodosController extends Controller
         // TODO Check exist
         // TODO Check parameter null
         $todo = Todo::find($id);
-        if ($todo === NULL) {
-            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        if (!$todo) {
+            return new JsonResponse(['message' => 'Not found'], 404);
         }
         $todo->update($request);
         return $todo;
@@ -77,8 +79,8 @@ class TodosController extends Controller
     {
         // TODO Check exist
         $todo = Todo::find($id);
-        if ($todo === NULL) {
-            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        if (!$todo) {
+            return new JsonResponse(['message' => 'Not found'], 404);
         }
         return $todo->delete();
     }
@@ -86,9 +88,10 @@ class TodosController extends Controller
     public function moveTodo($id)
     {
         // TODO Implement this action
+        // with transaction
         $todo = Todo::find($id);
-        if ($todo === NULL) {
-            return response()->json(['code'=> 404, 'message'=> 'Not found']);
+        if (!$todo) {
+            return new JsonResponse(['message' => 'Not found'], 404);
         }
         return $todo;
     }

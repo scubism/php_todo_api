@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Todo extends Model
+class TodoGroup extends Model
 {
-    protected $table = 'todos';
+    protected $table = 'todo_groups';
 
     use SoftDeletes;
 
     /**
-     * Get the group that owns this todo
+     * Get all todos of current group
      */
-    public function group()
+    public function todos()
     {
-        return $this->belongsTo('App\TodoGroup', 'todo_groups_id');
+        return $this->hasMany('App\Todo');
     }
 
     /**
@@ -25,10 +25,7 @@ class Todo extends Model
      * @var array
      */
     protected $fillable = [
-        'title',
-        'duedate',
-        'color',
-        'todo_groups_id',
+        'title'
     ];
 
     /**
