@@ -46,7 +46,6 @@ abstract class Repository implements RepositoryInterface {
 	}
 
 	public function update(array $data, $id) {
-		die("abv");
 		$model = $this->model->find($id);
         if (!$model) {
             return new JsonResponse(['message' => 'Not found'], 404);
