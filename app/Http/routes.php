@@ -11,12 +11,16 @@
 |
 */
 
-$app->get('/{name}', function ($name) use ($app) {
-   return 'Hello PHP TODO API by '.$name;
+$app->get('/', function () use ($app) {
+   return 'Hello PHP TODO API';
 });
 
-$app->group(['prefix' => 'v2'], function () use ($app) {
-    $app->get('/index', 'App\Http\Controllers\ExampleController@index');
-    $app->get('todos', 'App\Http\Controllers\APIController@getTodos');
-    $app->get('todo/{id}', 'App\Http\Controllers\APIController@getTodo');
+$app->group(['prefix' => 'v1'], function () use ($app) {
+    $app->get('index', 'App\Http\Controllers\TodosController@index');
+    $app->get('todos', 'App\Http\Controllers\TodosController@indexTodos');
+    $app->get('todos/{id}', 'App\Http\Controllers\TodosController@viewTodo');
+    $app->post('todos', 'App\Http\Controllers\TodosController@createTodo');
+    $app->put('todos/{id}', 'App\Http\Controllers\TodosController@updateTodo');
+    $app->delete('todos/{id}', 'App\Http\Controllers\TodosController@deleteTodo');
+    $app->post('todos/{id}/move', 'App\Http\Controllers\TodosController@moveTodo');
 });
