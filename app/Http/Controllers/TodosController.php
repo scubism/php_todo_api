@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Todo;
-use App\Repository\TodoRepository;
+use App\Repositories\TodoRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TodosController extends Controller
 {
-    // TODO Add todos repository
     // TODO Add Middleware to check todo exist
     private $todoRepo;
+
     /**
      * Create a new controller instance.
      *
@@ -50,7 +49,7 @@ class TodosController extends Controller
 
         $data = [
             'title' => $request->input('title'),
-            'duedate' => $request->input('duedate', null),
+            'due_date' => $request->input('due_date', null),
             'color' => $request->input('color', null),
             'todo_groups_id' => 1
         ];
@@ -66,7 +65,7 @@ class TodosController extends Controller
 
         $data = [
             'title' => $request->input('title'),
-            'duedate' => $request->input('duedate', null),
+            'due_date' => $request->input('due_date', null),
             'color' => $request->input('color', null)
         ];
 
@@ -79,9 +78,8 @@ class TodosController extends Controller
         return $this->todoRepo->delete($id);
     }
 
-    public function moveTodo($id)
+    public function moveTodo($id, Request $request)
     {
-        // TODO Check exist in middleware
-        return $this->todoRepo->move($id);
+        return $this->todoRepo->move($id, $request->input('prior_sibling_id', ''));
     }
 }
