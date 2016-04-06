@@ -16,6 +16,7 @@ if [ $ENV == 'local' ]; then
     sed -i "s/error_log = \/proc\/self\/fd\/2/error_log = \/var\/log\/php-fpm\/error.log/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/proc\/self\/fd\/2/access.log = \/var\/log\/php-fpm\/access.log/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
+  composer update
 else
   APP_DEBUG=false
   if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
@@ -25,6 +26,7 @@ else
     sed -i "s/error_log = \/var\/log\/php-fpm\/error.log/error_log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/var\/log\/php-fpm\/access.log/access.log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
+  composer install
 fi
 
 if [ ! -f ".env" ]; then
@@ -41,7 +43,10 @@ if [ ! -f ".env" ]; then
 fi
 
 chmod 775 -R /var/www/html
+chmod 777 -R /var/www/html/storage
 
 usermod -u 1000 www-data
+
+php artisan db:seed --class=TodoGroupSeeder
 
 exec "php-fpm"

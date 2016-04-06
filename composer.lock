@@ -2370,60 +2370,6 @@
             "time": "2015-05-29 06:29:14"
         },
         {
-            "name": "nordsoftware/lumen-cors",
-            "version": "1.5.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nordsoftware/lumen-cors.git",
-                "reference": "234a8f86941f7406900844e2efb0cc573b24fe0e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nordsoftware/lumen-cors/zipball/234a8f86941f7406900844e2efb0cc573b24fe0e",
-                "reference": "234a8f86941f7406900844e2efb0cc573b24fe0e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "codeception/codeception": "~2.1@dev",
-                "codeception/specify": "dev-master",
-                "codeception/verify": "dev-master",
-                "laravel/lumen-framework": "~5.1@dev"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Nord\\Lumen\\Cors\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christoffer Niska",
-                    "email": "christofferniska@gmail.com"
-                }
-            ],
-            "description": "CORS module for the Lumen PHP framework.",
-            "keywords": [
-                "cors",
-                "cross-origin",
-                "headers",
-                "http",
-                "laravel",
-                "lumen",
-                "preflight",
-                "request",
-                "resource",
-                "sharing"
-            ],
-            "time": "2016-03-30 10:49:57"
-        },
-        {
             "name": "phpdocumentor/reflection-docblock",
             "version": "2.0.4",
             "source": {

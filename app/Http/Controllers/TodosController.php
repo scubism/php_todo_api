@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Todo;
+use App\Repository\TodoRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Repository\TodoRepository;
 
 class TodosController extends Controller
 {
@@ -33,74 +33,55 @@ class TodosController extends Controller
 
     public function indexTodos()
     {
-        // TODO Check exist
-        // $result = Todo::all();
-        // return $result;
         return $this->todoRepo->all();
     }
 
     public function viewTodo($id)
     {
+        // TODO Check exist in middleware
         return $this->todoRepo->get($id);
     }
 
     public function createTodo(Request $request)
     {
-        // TODO Check parameter null
         $this->validate($request, [
-            'title' => 'required',
-            'todo_groups_id' => 'required'
+            'title' => 'required'
         ]);
 
-        $data = array('title' => $request->input('title'), 
-            'duedate' => $request->input('duedate', null), 
-            'color' => $request->input('color', null), 
-            'todo_groups_id' => $request->todo_groups_id);
+        $data = [
+            'title' => $request->input('title'),
+            'duedate' => $request->input('duedate', null),
+            'color' => $request->input('color', null),
+            'todo_groups_id' => 1
+        ];
         return $this->todoRepo->create($data);
     }
 
     public function updateTodo($id, Request $request)
     {
-        // TODO Check exist
-        // TODO Check parameter null
-        // $todo = Todo::find($id);
-        // if (!$todo) {
-        //     return new JsonResponse(['message' => 'Not found'], 404);
-        // }
-        // $todo->update($request);
-        // return $todo;
+        // TODO Check exist in middleware
         $this->validate($request, [
-            'title' => 'required',
-            'todo_groups_id' => 'required'
+            'title' => 'required'
         ]);
-        $data = array('title' => $request->input('title'), 
-            'duedate' => $request->input('duedate', null), 
-            'color' => $request->input('color', null), 
-            'todo_groups_id' => $request->todo_groups_id);
+
+        $data = [
+            'title' => $request->input('title'),
+            'duedate' => $request->input('duedate', null),
+            'color' => $request->input('color', null)
+        ];
 
         return $this->todoRepo->update($data, $id);
     }
 
     public function deleteTodo($id)
     {
-        // TODO Check exist
-        // $todo = Todo::find($id);
-        // if (!$todo) {
-        //     return new JsonResponse(['message' => 'Not found'], 404);
-        // }
-        // return $todo->delete();
+        // TODO Check exist in middleware
         return $this->todoRepo->delete($id);
     }
 
     public function moveTodo($id)
     {
-        // TODO Implement this action
-        // with transaction
-        // $todo = Todo::find($id);
-        // if (!$todo) {
-        //     return new JsonResponse(['message' => 'Not found'], 404);
-        // }
-        // return $todo;
+        // TODO Check exist in middleware
         return $this->todoRepo->move($id);
     }
 }

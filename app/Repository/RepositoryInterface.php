@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
-interface RepositoryInterface {
+interface RepositoryInterface
+{
 
 }
