@@ -7,17 +7,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TodoGroup extends Model
 {
-    protected $table = 'todo_groups';
-
     use SoftDeletes;
 
-    /**
-     * Get all todos of current group
-     */
-    public function todos()
-    {
-        return $this->hasMany('App\Todo');
-    }
+    protected $table = 'todo_groups';
 
     /**
      * The attributes that are mass assignable.
@@ -37,4 +29,11 @@ class TodoGroup extends Model
         'deleted_at', 'created_at', 'updated_at'
     ];
 
+    /**
+     * Get all todos of current group
+     */
+    public function todos()
+    {
+        return $this->hasMany(\App\Todo::class);
+    }
 }

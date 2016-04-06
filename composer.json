@@ -8,7 +8,8 @@
         "php": ">=5.5.9",
         "laravel/lumen-framework": "5.2.*",
         "vlucas/phpdotenv": "~2.2",
-        "vluzrmos/lumen-cors": "2.1.*"
+        "vluzrmos/lumen-cors": "2.1.*",
+        "doctrine/dbal": "2.5.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

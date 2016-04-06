@@ -7,17 +7,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Todo extends Model
 {
-    protected $table = 'todos';
-
     use SoftDeletes;
 
     /**
-     * Get the group that owns this todo
+     * The database table used by the model.
+     *
+     * @var string
      */
-    public function group()
-    {
-        return $this->belongsTo('App\TodoGroup', 'todo_groups_id');
-    }
+    public $table = 'todos';
+
+    /**
+     * The attributes excluded from the model query
+     *
+     * @var array
+     */
+    protected $hidden = ['deleted_at'];
 
     /**
      * The attributes that are mass assignable.
@@ -26,9 +30,10 @@ class Todo extends Model
      */
     protected $fillable = [
         'title',
-        'duedate',
+        'due_date',
         'color',
         'todo_groups_id',
+        'sort_order'
     ];
 
     /**
@@ -40,4 +45,11 @@ class Todo extends Model
         'deleted_at', 'created_at', 'updated_at'
     ];
 
+    /**
+     * Get the group that owns this todo
+     */
+    public function group()
+    {
+        return $this->belongsTo(App\TodoGroup::class, 'todo_groups_id');
+    }
 }
