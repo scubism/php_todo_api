@@ -20,6 +20,12 @@ class TodosController extends Controller
     {
         // Construct
         $this->todoRepo = $todoRepo;
+
+        $this->middleware('check_exist:\App\Models\Todo', [
+            'only' => [
+                'viewTodo', 'updateTodo', 'deleteTodo', 'moveTodo'
+            ]
+        ]);
     }
 
     public function index()
@@ -37,7 +43,6 @@ class TodosController extends Controller
 
     public function viewTodo($id)
     {
-        // TODO Check exist in middleware
         return $this->todoRepo->get($id);
     }
 
@@ -51,7 +56,7 @@ class TodosController extends Controller
             'title' => $request->input('title'),
             'due_date' => $request->input('due_date', null),
             'color' => $request->input('color', null),
-            'todo_groups_id' => 1
+            'todo_groups_id' => $request->input('todo_groups_id')
         ];
         return $this->todoRepo->create($data);
     }
@@ -69,17 +74,28 @@ class TodosController extends Controller
             'color' => $request->input('color', null)
         ];
 
-        return $this->todoRepo->update($data, $id);
+        $updated = $this->todoRepo->update($data, $id);
+        if ($updated) {
+            return $updated;
+        }
+        return response(['error' => 'Couldn\'t update'], 422);
     }
 
     public function deleteTodo($id)
     {
-        // TODO Check exist in middleware
-        return $this->todoRepo->delete($id);
+        $deleted = $this->todoRepo->delete($id);
+        if ($deleted) {
+            return $deleted;
+        }
+        return response(['error' => 'Couldn\'t delete'], 422);
     }
 
     public function moveTodo($id, Request $request)
     {
-        return $this->todoRepo->move($id, $request->input('prior_sibling_id', ''));
+        $moved = $this->todoRepo->move($id, $request->input('prior_sibling_id', ''));
+        if ($moved) {
+            return $moved;
+        }
+        return response(['error' => 'Couldn\'t move'], 422);
     }
 }

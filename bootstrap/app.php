@@ -59,13 +59,17 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
-
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
+
+$app->routeMiddleware([
+    'check_exist' => App\Http\Middleware\CheckRecordExistMiddleware::class,
+]);
+
+$app->middleware([
+    App\Http\Middleware\AddTodoGroupMiddleware::class
+]);
 
 $app->middleware([
     Vluzrmos\LumenCors\CorsMiddleware::class
@@ -82,8 +86,8 @@ $app->middleware([
 |
 */
 
-$app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
 
 /*
