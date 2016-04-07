@@ -16,12 +16,22 @@ abstract class Repository implements RepositoryInterface
 
     abstract function model();
 
+    /**
+     * Construct
+     *
+     * @param App $app
+     */
     public function __construct(App $app)
     {
         $this->app = $app;
         $this->makeModel();
     }
 
+    /**
+     * Create model
+     *
+     * @return Model
+     */
     public function makeModel()
     {
         $model = $this->app->make($this->model());
@@ -32,15 +42,27 @@ abstract class Repository implements RepositoryInterface
         }
     }
 
+    /**
+     * Get all records
+     *
+     * @return array
+     */
     public function all()
     {
         $model = $this->model;
         if ($this->sortField) {
-            $model = $this->model->orderBy($this->sortField, $this->sortType);
+            $model = $model->orderBy($this->sortField, $this->sortType);
         }
         return $model->get();
     }
 
+    /**
+     * Get detail of a record
+     *
+     * @param  int $id
+     *
+     * @return object/bool
+     */
     public function get($id)
     {
         $record = $this->model->find($id);
@@ -50,6 +72,13 @@ abstract class Repository implements RepositoryInterface
         return false;
     }
 
+    /**
+     * Create a record
+     *
+     * @param  array  $data
+     *
+     * @return object/bool
+     */
     public function create(array $data)
     {
         DB::beginTransaction();
@@ -69,6 +98,14 @@ abstract class Repository implements RepositoryInterface
         return false;
     }
 
+    /**
+     * Update a record
+     *
+     * @param  array $data
+     * @param  int $id
+     *
+     * @return object/bool Updated record / false if update failed
+     */
     public function update(array $data, $id)
     {
         DB::beginTransaction();
@@ -84,6 +121,13 @@ abstract class Repository implements RepositoryInterface
         return false;
     }
 
+    /**
+     * Delete a record
+     *
+     * @param  int $id Id of record for deleting
+     *
+     * @return object/bool Deleted record / false if delete failed
+     */
     public function delete($id)
     {
         DB::beginTransaction();
@@ -104,12 +148,12 @@ abstract class Repository implements RepositoryInterface
     }
 
     /**
-     * Move Todo
+     * Move record to under another record
      *
-     * @param  int $id Todo ID
-     * @param  int $priorSiblingId Id of Todo upper than current todo
+     * @param  int $id Id of record
+     * @param  int $priorSiblingId Id of record upper than current record
      *
-     * @return object
+     * @return object/bool moved record /false if move failed
      */
     public function move($id, $priorSiblingId)
     {
@@ -120,6 +164,7 @@ abstract class Repository implements RepositoryInterface
                 // Get prior sibling record's order
                 $priorOrder = $this->getOrder($priorSiblingId);
                 $currentOrder = $record->{$this->sortField};
+
                 if ($currentOrder > $priorOrder) {
                     $record->{$this->sortField} = $priorOrder + 1;
                     $record->save();
@@ -144,6 +189,13 @@ abstract class Repository implements RepositoryInterface
         return false;
     }
 
+    /**
+     * Get order of a record
+     *
+     * @param  int $id
+     *
+     * @return int
+     */
     public function getOrder($id)
     {
         $order = $this->model->find($id);
@@ -155,6 +207,7 @@ abstract class Repository implements RepositoryInterface
 
     /**
      * Get max order by sorted field
+     *
      * @return int
      */
     public function getMaxOrder()

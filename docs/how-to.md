@@ -52,7 +52,7 @@ Schema::table('users', function ($table) {
     $table->string('name', 50)->change();
 });
 
-# Renaming Columns:
+# Renaming Columns: (require `doctrine/dbal` to be able to rename column)
 Schema::table('users', function ($table) {
     $table->renameColumn('from', 'to');
 });
@@ -74,7 +74,99 @@ php artisan migrate:reset
 You can read more detail in [Laravel Migration document page](https://laravel.com/docs/5.2/migrations)
 
 ### Create a route
+File `app/Http/routes.php`:
+
+__Available Router Methods__
+```
+$app->get($uri, $callback);
+$app->post($uri, $callback);
+$app->put($uri, $callback);
+$app->patch($uri, $callback);
+$app->delete($uri, $callback);
+$app->options($uri, $callback);
+
+# Basic Example
+$app->get('foo', function () {
+    return 'Hello World';
+});
+```
+
+__Route Parameters__
+```
+$app->get('user/{id}', function ($id) {
+    return 'User '.$id;
+});
+```
+
+__Named Routes__
+```
+$app->get('profile', [
+    'as' => 'profile', 'uses' => 'UserController@showProfile'
+]);
+```
+
+Please read more in [Lumen Routing page](https://lumen.laravel.com/docs/5.2/routing)
 
 ### Create a model
+- Create a files in `app/Models`
+```
+touch app/Models/User.php
+```
+
+- Sample model:
+```
+# app/Models/User.php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class User extends Model
+{
+    protected $table = 'users';
+}
+```
+
+Read more about [Eloquent ORM](https://laravel.com/docs/5.2/eloquent)
 
 ### Create a controller
+
+- Create a files in `app/Http/Controllers`
+```
+touch app/Http/Controllers/UsersController.php
+```
+
+- Sample controller:
+```
+# app/Http/Controllers/UsersController.php
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User; # Use User model
+
+class UsersController extends Controller
+{
+    /**
+     * Retrieve the user for the given ID.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($id)
+    {
+        return User::findOrFail($id);
+    }
+}
+
+```
+
+We can route to the controller action like so:
+```
+$app->get('user/{id}', 'UserController@show');
+```
+
+Read more about [Lumen Controller](https://lumen.laravel.com/docs/5.2/controllers)
+
+All the information above could be found at [Lumen Documentation](https://lumen.laravel.com/docs)
