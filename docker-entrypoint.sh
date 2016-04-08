@@ -47,6 +47,7 @@ chmod 777 -R /var/www/html/storage
 
 usermod -u 1000 www-data
 
+php artisan migrate
 php artisan db:seed --class=TodoGroupSeeder
 
 exec "php-fpm"
