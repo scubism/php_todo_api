@@ -3,6 +3,7 @@ set -e
 
 ENV=${APP_ENV:-'local'}
 RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
+FORCE=''
 
 if [ $ENV == 'local' ]; then
   APP_DEBUG=true
@@ -16,9 +17,10 @@ if [ $ENV == 'local' ]; then
     sed -i "s/error_log = \/proc\/self\/fd\/2/error_log = \/var\/log\/php-fpm\/error.log/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/proc\/self\/fd\/2/access.log = \/var\/log\/php-fpm\/access.log/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
-  composer update
+  composer update & wait
 else
   APP_DEBUG=false
+  FORCE='--force'
   if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
     sed -i "s/daemonize = yes/daemonize = no/g" /usr/local/etc/php-fpm.d/zz-docker.conf
   fi
@@ -26,7 +28,7 @@ else
     sed -i "s/error_log = \/var\/log\/php-fpm\/error.log/error_log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/var\/log\/php-fpm\/access.log/access.log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
-  composer install
+  composer install & wait
 fi
 
 if [ ! -f ".env" ]; then
@@ -47,7 +49,7 @@ chmod 777 -R /var/www/html/storage
 
 usermod -u 1000 www-data
 
-php artisan migrate
-php artisan db:seed --class=TodoGroupSeeder
+php artisan migrate ${FORCE} & wait
+php artisan db:seed --class=TodoGroupSeeder ${FORCE} & wait
 
 exec "php-fpm"

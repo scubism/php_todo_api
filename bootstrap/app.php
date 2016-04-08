@@ -68,11 +68,8 @@ $app->routeMiddleware([
 ]);
 
 $app->middleware([
+    Vluzrmos\LumenCors\CorsMiddleware::class,
     App\Http\Middleware\AddTodoGroupMiddleware::class
-]);
-
-$app->middleware([
-    Vluzrmos\LumenCors\CorsMiddleware::class
 ]);
 
 /*
