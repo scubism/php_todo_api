@@ -17,7 +17,6 @@ if [ $ENV == 'local' ]; then
     sed -i "s/error_log = \/proc\/self\/fd\/2/error_log = \/var\/log\/php-fpm\/error.log/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/proc\/self\/fd\/2/access.log = \/var\/log\/php-fpm\/access.log/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
-  composer update & wait
 else
   APP_DEBUG=false
   FORCE='--force'
@@ -28,7 +27,6 @@ else
     sed -i "s/error_log = \/var\/log\/php-fpm\/error.log/error_log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/var\/log\/php-fpm\/access.log/access.log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
-  composer install & wait
 fi
 
 if [ ! -f ".env" ]; then
