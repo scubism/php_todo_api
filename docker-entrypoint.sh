@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+usermod -u 1000 www-data
+
 ENV=${APP_ENV:-'local'}
 RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 FORCE=''
@@ -42,10 +44,8 @@ if [ ! -f ".env" ]; then
     > .env
 fi
 
-chmod 775 -R /var/www/html
+chown -R www-data:www-data /var/www/html
 chmod 777 -R /var/www/html/storage
-
-usermod -u 1000 www-data
 
 php artisan migrate ${FORCE} & wait
 php artisan db:seed --class=TodoGroupSeeder ${FORCE} & wait
