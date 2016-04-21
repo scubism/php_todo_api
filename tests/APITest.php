@@ -1,10 +1,8 @@
 <?php
 
 use Laravel\Lumen\Testing\DatabaseTransactions;
-use App\Repositories\TodoRepository;
 
 class APITest extends TestCase {
-	private $todoRepo;
 
 	public function testAllTodos() {
 		$this->json('GET', '/v1/todos')
