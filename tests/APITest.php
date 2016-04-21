@@ -1,8 +1,11 @@
 <?php
 
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use App\Repositories\TodoRepository;
 
 class APITest extends TestCase {
+	private $todoRepo;
+
 	public function testAllTodos() {
 		$this->json('GET', '/v1/todos')
 			->seeJson([
@@ -90,9 +93,24 @@ class APITest extends TestCase {
 				'error' => 'Not found.'
 			]);
 
+		$this->json('POST', '/v1/todos/18/move', ['prior_sibling_id' => 0])
+			->seeJson([
+				'id' => 18,
+				'sort_order' => 1
+			]);
+		$response = $this->call('GET', '/v1/todos/2');
+		$json = json_decode($response->getContent());
+		
+		$sort_order = 0;
+		if (array_key_exists('sort_order', $json)) {
+			$sort_order = $json->{'sort_order'};
+		}
+		$sort_order++;
+
 		$this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => 2])
 			->seeJson([
-				'id' => 3
+				'id' => 3,
+				'sort_order' => $sort_order
 			]);
 	}
 }
