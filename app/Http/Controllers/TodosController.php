@@ -56,7 +56,8 @@ class TodosController extends Controller
             'title' => $request->input('title'),
             'due_date' => $request->input('due_date', null),
             'color' => $request->input('color', null),
-            'todo_groups_id' => $request->input('todo_groups_id')
+            'todo_groups_id' => $request->input('todo_groups_id'),
+            'marked' => $request->input('marked')
         ];
         return $this->todoRepo->create($data);
     }
@@ -71,7 +72,8 @@ class TodosController extends Controller
         $data = [
             'title' => $request->input('title'),
             'due_date' => $request->input('due_date', null),
-            'color' => $request->input('color', null)
+            'color' => $request->input('color', null),
+            'marked' => $request->input('marked')
         ];
 
         $updated = $this->todoRepo->update($data, $id);
