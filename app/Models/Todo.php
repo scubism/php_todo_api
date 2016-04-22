@@ -33,7 +33,8 @@ class Todo extends Model
         'due_date',
         'color',
         'todo_groups_id',
-        'sort_order'
+        'sort_order',
+        'marked'
     ];
 
     /**
