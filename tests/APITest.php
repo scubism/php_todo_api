@@ -1,13 +1,16 @@
 <?php
 
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use Laravel\Lumen\Testing\DatabaseMigrations;
 
 class APITest extends TestCase {
+
+	// use DatabaseMigrations;
 
 	public function testAllTodos() {
 		$this->json('GET', '/v1/todos')
 			->seeJson([
-				'id' => 2
+				'id' => 3
 			]);
 	}
 
@@ -17,9 +20,9 @@ class APITest extends TestCase {
 				'error' => 'Not found.'
 			]);
 
-		$this->json('GET', '/v1/todos/2')
+		$this->json('GET', '/v1/todos/3')
 			->seeJson([
-				'id' => 2
+				'id' => 3
 			]);
 	}
 
@@ -58,7 +61,7 @@ class APITest extends TestCase {
 				'error' => 'Not found.'
 			]);
 
-		$this->json('PUT', '/v1/todos/2', ['title' => 'Test Todo 1 Updated', 
+		$this->json('PUT', '/v1/todos/3', ['title' => 'Test Todo 1 Updated', 
 			'duedate' => '2016-04-20 10:42', 
 			'color' => 'white', 
 			'todo_groups_id' => '1'])
@@ -77,12 +80,14 @@ class APITest extends TestCase {
 			->seeJson([
 				'error' => 'Not found.'
 			]);
-		$this->json('DELETE', '/v1/todos/12')
+		$this->json('DELETE', '/v1/todos/110')
 			->seeJson([
 				'title' => 'Test Todo 1',
 				'color' => 'black', 
 				'todo_groups_id' => 1
 			]);
+		$this->json('GET', '/v1/todos/110')
+			->dontSeeJson(['id' => 110]);
 	}
 
 	public function testMoveTodo() {
@@ -96,19 +101,26 @@ class APITest extends TestCase {
 				'id' => 18,
 				'sort_order' => 1
 			]);
-		$response = $this->call('GET', '/v1/todos/2');
-		$json = json_decode($response->getContent());
+		$responseTodo3 = $this->call('GET', '/v1/todos/3');
+		$jsonTodo3 = json_decode($responseTodo3->getContent());
 		
-		$sort_order = 0;
-		if (array_key_exists('sort_order', $json)) {
-			$sort_order = $json->{'sort_order'};
-		}
-		$sort_order++;
+		$responseTodo18 = $this->call('GET', '/v1/todos/18');
+		$jsonTodo18 = json_decode($responseTodo18->getContent());
 
-		$this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => 2])
+		$sort_orderTodo18 = $jsonTodo18->{'sort_order'};
+
+		$sort_orderTodo3 = 0;
+		if (array_key_exists('sort_order', $jsonTodo3)) {
+			$sort_orderTodo3 = $jsonTodo3->{'sort_order'};
+		}
+		if ($sort_orderTodo18 > $sort_orderTodo3) {
+			$sort_orderTodo3++;	
+		}
+
+		$this->json('POST', '/v1/todos/18/move', ['prior_sibling_id' => 3])
 			->seeJson([
-				'id' => 3,
-				'sort_order' => $sort_order
+				'id' => 18,
+				'sort_order' => $sort_orderTodo3
 			]);
 	}
 }
