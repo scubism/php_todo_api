@@ -1,6 +1,10 @@
-FROM scubism/php_api_base
+FROM scubism/php_api_base:latest
 
-COPY . /var/www/html
+# === Set app specific settings ===
+
+COPY . .
+
+RUN composer install --no-dev
 
 COPY docker-entrypoint.sh /
 
