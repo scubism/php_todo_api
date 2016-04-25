@@ -43,7 +43,11 @@ class TodosController extends Controller
 
     public function viewTodo($id)
     {
-        return $this->todoRepo->get($id);
+        $result = $this->todoRepo->get($id);
+        if ($result) {
+            return $result;
+        }
+        return response(['error' => 'Couldn\'t get Todo'], 422);
     }
 
     public function createTodo(Request $request)
@@ -59,7 +63,12 @@ class TodosController extends Controller
             'todo_groups_id' => $request->input('todo_groups_id'),
             'marked' => $request->input('marked')
         ];
-        return $this->todoRepo->create($data);
+
+        $created = $this->todoRepo->create($data);
+        if ($created) {
+            return $created;
+        }
+        return response(['error' => 'Couldn\'t create Todo'], 422);
     }
 
     public function updateTodo($id, Request $request)

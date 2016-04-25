@@ -11,9 +11,10 @@
 |
 */
 
-$factory->define(App\User::class, function ($faker) {
+$factory->define(App\Models\Todo::class, function ($faker) {
     return [
-        'name' => $faker->name,
-        'email' => $faker->email,
+        'title' => $faker->sentence(4, true),
+        'color' => $faker->hexcolor,
+        'todo_groups_id' => 1
     ];
 });
