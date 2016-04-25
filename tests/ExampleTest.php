@@ -2,7 +2,7 @@
 
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
-class ExampleTest extends TestCase
+class ExampleTest extends \TestCase
 {
     /**
      * A basic test example.
@@ -13,8 +13,6 @@ class ExampleTest extends TestCase
     {
         $this->get('/');
 
-        $this->assertEquals(
-            $this->response->getContent(), 'Hello PHP TODO API'
-        );
+        $this->assertResponseOk();
     }
 }
