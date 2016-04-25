@@ -1,12 +1,16 @@
 <?php
 
-use Laravel\Lumen\Testing\DatabaseTransactions;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use App\Models\Todo;
+use Illuminate\Support\Facades\Artisan as Artisan;
 
 class APITest extends TestCase {
-    // use DatabaseMigrations;
+    use DatabaseMigrations;
 
     public function testAllTodos() {
+        \App\Models\Todo::create(['title' => 'Test Todo', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '1']);
+        \App\Models\Todo::create(['title' => 'Test Todo 2', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '2']);
+        \App\Models\Todo::create(['title' => 'Test Todo 3', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '3']);
         $this->json('GET', '/v1/todos')
             ->seeJson([
                 'id' => 3
@@ -14,6 +18,9 @@ class APITest extends TestCase {
     }
 
     public function testViewTodo() {
+    	\App\Models\Todo::create(['title' => 'Test Todo', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '1']);
+        \App\Models\Todo::create(['title' => 'Test Todo 2', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '2']);
+        \App\Models\Todo::create(['title' => 'Test Todo 3', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '3']);
         $this->json('GET', '/v1/todos/0')
             ->seeJson([
                 'error' => 'Not found.'
@@ -44,6 +51,10 @@ class APITest extends TestCase {
     }
 
     public function testUpdateTodo() {
+    	\App\Models\Todo::create(['title' => 'Test Todo', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '1']);
+        \App\Models\Todo::create(['title' => 'Test Todo 2', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '2']);
+        \App\Models\Todo::create(['title' => 'Test Todo 3', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '3']);
+
         $response = $this->call('PUT', '/v1/todos/0', [
             'title' => 'Test Todo 0',
             'duedate' => '2016-04-20 10:42', 
@@ -63,15 +74,18 @@ class APITest extends TestCase {
         $this->json('PUT', '/v1/todos/3', ['title' => 'Test Todo 1 Updated', 
                 'duedate' => '2016-04-20 10:42', 
                 'color' => 'white', 
-                ’todo_groups_id' => '1'])
+                'todo_groups_id' => '1'])
             ->seeJson([
                 'title' => 'Test Todo 1 Updated',
                 'color' => 'white', 
-                'todo_groups_id' => 1
+                'todo_groups_id' => '1'
             ]);
     }
 
     public function testDeleteTodo() {
+    	\App\Models\Todo::create(['title' => 'Test Todo', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '1']);
+        \App\Models\Todo::create(['title' => 'Test Todo 2', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '2']);
+        \App\Models\Todo::create(['title' => 'Test Todo 3', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '3']);
         $response = $this->call('DELETE', '/v1/todos/0');
         $this->assertEquals(404, $response->status());
 
@@ -79,47 +93,50 @@ class APITest extends TestCase {
             ->seeJson([
                 'error' => 'Not found.'
             ]);
-        $this->json('DELETE', '/v1/todos/110')
+        $this->json('DELETE', '/v1/todos/3')
             ->seeJson([
-                'title' => 'Test Todo 1',
+                'title' => 'Test Todo 3',
                 'color' => 'black', 
-                'todo_groups_id' => 1
+                'todo_groups_id' => '1'
             ]);
-        $this->json('GET', '/v1/todos/110')
-            ->dontSeeJson(['id' => 110]);
+        $this->json('GET', '/v1/todos/3')
+            ->dontSeeJson(['id' => 3]);
     }
 
     public function testMoveTodo() {
+    	\App\Models\Todo::create(['title' => 'Test Todo', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '1']);
+        \App\Models\Todo::create(['title' => 'Test Todo 2', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '2']);
+        \App\Models\Todo::create(['title' => 'Test Todo 3', 'todo_groups_id' => '1', 'color' => 'black', 'sort_order' => '3']);
         $this->json('POST', '/v1/todos/0/move', ['prior_sibling_id' => 2])
             ->seeJson([
                 'error' => 'Not found.'
             ]);
 
-        $this->json('POST', '/v1/todos/18/move', ['prior_sibling_id' => 0])
+        $this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => 0])
             ->seeJson([
-                'id' => 18,
+                'id' => 3,
                 'sort_order' => 1
             ]);
+        $responseTodo2 = $this->call('GET', '/v1/todos/2');
+        $jsonTodo2 = json_decode($responseTodo2->getContent());
+		
         $responseTodo3 = $this->call('GET', '/v1/todos/3');
         $jsonTodo3 = json_decode($responseTodo3->getContent());
-		
-        $responseTodo18 = $this->call('GET', '/v1/todos/18');
-        $jsonTodo18 = json_decode($responseTodo18->getContent());
 
-        $sort_orderTodo18 = $jsonTodo18->{'sort_order'};
+        $sort_orderTodo3 = $jsonTodo3->{'sort_order'};
 
-        $sort_orderTodo3 = 0;
+        $sort_orderTodo2 = 0;
         if (array_key_exists('sort_order', $jsonTodo3)) {
-            $sort_orderTodo3 = $jsonTodo3->{'sort_order'};
+            $sort_orderTodo2 = $jsonTodo2->{'sort_order'};
         }
-        if ($sort_orderTodo18 > $sort_orderTodo3) {
-            $sort_orderTodo3++;	
+        if ($sort_orderTodo3 > $sort_orderTodo2) {
+            $sort_orderTodo2++;	
         }
 
-        $this->json('POST', '/v1/todos/18/move', ['prior_sibling_id' => 3])
+        $this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => 2])
             ->seeJson([
-                'id' => 18,
-                'sort_order' => $sort_orderTodo3
+                'id' => 3,
+                'sort_order' => $sort_orderTodo2
             ]);
     }
 }
