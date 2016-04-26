@@ -23,4 +23,7 @@ $app->group(['prefix' => 'v1'], function () use ($app) {
     $app->put('todos/{id}', 'App\Http\Controllers\TodosController@updateTodo');
     $app->delete('todos/{id}', 'App\Http\Controllers\TodosController@deleteTodo');
     $app->post('todos/{id}/move', 'App\Http\Controllers\TodosController@moveTodo');
+    $app->get('swagger.yml', function(){
+        return file_get_contents(base_path("/resources/views/swagger.yml"));
+    });
 });
