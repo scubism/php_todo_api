@@ -1,201 +1,193 @@
   swagger: "2.0"
-  info: 
-    description: "Go Todo REST Api"
+  info:
+    description: "PHP Todo RESTful API"
     version: "1.0.0"
-    title: "Go Todo API"
-    contact: 
+    title: "PHP Todo API"
+    contact:
       email: "l_tung@stagegroup.jp"
-    license: 
+    license:
       name: "Released under the MIT License."
       url: "https://opensource.org/licenses/MIT"
   host: "100.94.47.221"
   basePath: "/v1"
-  tags: 
-    - 
+  tags:
+    -
       name: "todo"
       description: "Todo API"
-      externalDocs: 
+      externalDocs:
         description: "comming soon"
         url: "xxxx"
-  schemes: 
+  schemes:
     - "https"
-  paths: 
-    /todos: 
-      get: 
-        tags: 
+  paths:
+    /todos:
+      get:
+        tags:
           - "todo"
         summary: "Get todo list"
         description: "Returns all todo records that have in root group"
-        produces: 
+        produces:
           - "application/json"
-        responses: 
-          200: 
+        responses:
+          200:
             description: "A list of todos."
-            schema: 
+            schema:
               type: "array"
-              items: 
-                - 
-                  $ref: "#/definitions/Todo"
-          default: 
+              items:
+                - $ref: "#/definitions/Todo"
+          default:
             description: "Unexpected error"
-            schema: 
+            schema:
               $ref: "#/definitions/Error"
-      post: 
-        tags: 
+      post:
+        tags:
           - "todo"
         summary: "Create todo"
         description: "Create and Add todo a record to root group"
-        produces: 
+        produces:
           - "application/json"
-        parameters: 
-          - 
-            name: "body"
+        parameters:
+          - name: "body"
             in: "body"
             description: "todo param"
-            schema: 
+            schema:
               $ref: "#/definitions/TodoRequest"
-        responses: 
-          200: 
+        responses:
+          200:
             description: "A todo record added"
-            schema:  
+            schema:
               $ref: "#/definitions/Todo"
-          default: 
+          default:
             description: "Unexpected error"
-            schema: 
+            schema:
               $ref: "#/definitions/Error"
-    /todos/{id}: 
-      get: 
-        tags: 
+    /todos/{id}:
+      get:
+        tags:
           - "todo"
         summary: "Get todo record"
         description: "Return a todo record"
-        produces: 
+        produces:
           - "application/json"
-        parameters: 
-          - 
-            name: "id"
+        parameters:
+          - name: "id"
             in: "path"
             description: "todo id"
             required: true
-            type: "string"
-        responses: 
-          200: 
+            type: "number"
+        responses:
+          200:
             description: "A todo record."
-            schema: 
+            schema:
               $ref: "#/definitions/Todo"
-          default: 
+          default:
             description: "Unexpected error"
-            schema: 
+            schema:
               $ref: "#/definitions/Error"
-      put: 
-        tags: 
+      put:
+        tags:
           - "todo"
         summary: "update a todo record"
         description: "Return the updated record"
-        produces: 
+        produces:
           - "application/json"
-        parameters: 
-          - 
-            name: "body"
+        parameters:
+          - name: "body"
             in: "body"
             description: "todo param"
-            schema: 
+            schema:
               $ref: "#/definitions/TodoRequest"
-          - 
-            name: "id"
+          - name: "id"
             in: "path"
             description: "todo id"
             required: true
-            type: "string"
-        responses: 
-          200: 
+            type: "number"
+        responses:
+          200:
             description: "A todo record."
-            schema: 
+            schema:
               $ref: "#/definitions/Todo"
-          default: 
+          default:
             description: "Unexpected error"
-            schema: 
+            schema:
               $ref: "#/definitions/Error"
-      delete: 
-        tags: 
+      delete:
+        tags:
           - "todo"
         summary: "delete a todo record"
         description: "Return the deleted record"
-        produces: 
+        produces:
           - "application/json"
-        parameters: 
-          - 
-            name: "id"
+        parameters:
+          - name: "id"
             in: "path"
             description: "todo id"
             required: true
-            type: "string"
-        responses: 
-          200: 
+            type: "number"
+        responses:
+          200:
             description: "The deleted record."
-            schema: 
+            schema:
               $ref: "#/definitions/Todo"
-          default: 
+          default:
             description: "Unexpected error"
-            schema: 
+            schema:
               $ref: "#/definitions/Error"
-    /todos/{id}/move: 
-      post: 
-        tags: 
+    /todos/{id}/move:
+      post:
+        tags:
           - "todo"
         summary: "Move todo record to root group"
         description: "move a todo record to root group"
-        produces: 
+        consumes:
+          - "application/x-www-form-urlencoded"
+        produces:
           - "application/json"
-        parameters: 
-          - 
-            name: "body"
-            in: "body"
-            description: "todo param"
-            schema: 
-              $ref: "#/definitions/Todo"
-          - 
-            name: "id"
-            in: "path"
-            description: "todo id"
+        parameters:
+          - name: "prior_sibling_id"
+            in: "formData"
+            description: "Id of prior sibling Todo"
             required: true
-            type: "string"
-        responses: 
-          200: 
+            type: "number"
+          - name: "id"
+            in: "path"
+            description: "todo Id"
+            required: true
+            type: "number"
+        responses:
+          200:
             description: "A todo record added"
-            schema: 
+            schema:
               $ref: "#/definitions/Todo"
-          404: 
+          404:
             description: "Not Found"
-            schema: 
+            schema:
               $ref: "#/definitions/Todo"
-          default: 
+          default:
             description: "Unexpected error"
-            schema: 
+            schema:
               $ref: "#/definitions/Error"
-  definitions: 
+  definitions:
     TodoRequest:
       type: "object"
-      properties: 
-        title: 
+      properties:
+        title:
           type: "string"
-        due_date: 
+        due_date:
           type: "string"
           format: "date"
-        color: 
+        color:
           type: "string"
-        marked: 
+        marked:
           type: "boolean"
     Todo:
       "allOf":
-        - 
-          $ref: "#/definitions/TodoRequest"
-        -
-          properties: 
-            id: 
-              type: "string"
-    Error: 
+        - $ref: "#/definitions/TodoRequest"
+        - properties:
+            id:
+              type: "number"
+    Error:
       type: "object"
-      properties: 
-        error: 
+      properties:
+        error:
           type: "string"

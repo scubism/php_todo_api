@@ -45,9 +45,8 @@ if [ ! -f ".env" ]; then
 fi
 
 chown -R www-data:www-data /var/www/html
-
 chmod 777 -R /var/www/html/storage
-cd /var/www/html & composer update
+
 php artisan migrate ${FORCE} & wait
 php artisan db:seed --class=TodoGroupSeeder ${FORCE} & wait
 
