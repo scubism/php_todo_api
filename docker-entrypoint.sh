@@ -7,6 +7,14 @@ ENV=${APP_ENV:-'local'}
 RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 FORCE=''
 
+if [ -f "/var/run/php-fpm.pid" ]; then
+   pid=`cat /var/run/php-fpm.pid`
+   if [ ! -z ${pid} ]; then
+     echo "PHP-FPM is running. Killing pid ${pid}"
+     kill ${pid}
+   fi
+ fi
+
 if [ $ENV == 'local' ]; then
   APP_DEBUG=true
   if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
@@ -19,6 +27,7 @@ if [ $ENV == 'local' ]; then
     sed -i "s/error_log = \/proc\/self\/fd\/2/error_log = \/var\/log\/php-fpm\/error.log/g" /usr/local/etc/php-fpm.d/docker.conf
     sed -i "s/access.log = \/proc\/self\/fd\/2/access.log = \/var\/log\/php-fpm\/access.log/g" /usr/local/etc/php-fpm.d/docker.conf
   fi
+  composer install # For install dev packages
 else
   APP_DEBUG=false
   FORCE='--force'
@@ -47,7 +56,8 @@ fi
 chown -R www-data:www-data /var/www/html
 chmod 777 -R /var/www/html/storage
 
+composer dump-autoload
 php artisan migrate ${FORCE} & wait
 php artisan db:seed --class=TodoGroupSeeder ${FORCE} & wait
 
-exec "php-fpm"
+exec "php-fpm" -g /var/run/php-fpm.pid
