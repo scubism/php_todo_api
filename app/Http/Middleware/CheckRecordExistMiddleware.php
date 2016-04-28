@@ -22,7 +22,7 @@ class CheckRecordExistMiddleware
         $model = new $class;
         $id = $request->segment(3);
         if (!$id || !$model->find($id)) {
-            return response(['error' => 'Not found.'], 404);
+            return response(['message' => 'Couldn\'t find the todo'], 500);
         }
         return $next($request);
     }

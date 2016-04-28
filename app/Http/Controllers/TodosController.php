@@ -47,7 +47,7 @@ class TodosController extends Controller
         if ($result) {
             return $result;
         }
-        return response(['error' => 'Couldn\'t get Todo'], 422);
+        return response(['message' => 'Couldn\'t find the Todo'], 500);
     }
 
     public function createTodo(Request $request)
@@ -55,7 +55,6 @@ class TodosController extends Controller
         $this->validate($request, [
             'title' => 'required'
         ]);
-
         $data = [
             'title' => $request->input('title'),
             'due_date' => $request->input('due_date', null),
@@ -68,7 +67,7 @@ class TodosController extends Controller
         if ($created) {
             return $created;
         }
-        return response(['error' => 'Couldn\'t create Todo'], 422);
+        return response(['message' => 'Couldn\'t create Todo'], 500);
     }
 
     public function updateTodo($id, Request $request)
@@ -89,7 +88,7 @@ class TodosController extends Controller
         if ($updated) {
             return $updated;
         }
-        return response(['error' => 'Couldn\'t update'], 422);
+        return response(['message' => 'Couldn\'t update the Todo'], 500);
     }
 
     public function deleteTodo($id)
@@ -98,7 +97,7 @@ class TodosController extends Controller
         if ($deleted) {
             return $deleted;
         }
-        return response(['error' => 'Couldn\'t delete'], 422);
+        return response(['message' => 'Couldn\'t delete the Todo'], 500);
     }
 
     public function moveTodo($id, Request $request)
@@ -107,6 +106,6 @@ class TodosController extends Controller
         if ($moved) {
             return $moved;
         }
-        return response(['error' => 'Couldn\'t move'], 422);
+        return response(['message' => 'Couldn\'t move the Todo'], 500);
     }
 }
