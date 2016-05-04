@@ -32,9 +32,9 @@ class APITest extends TestCase {
     {
         $this->json('GET', '/v1/todos/1')
             ->seeJson([
-                'error' => 'Not found.'
+                'message' => 'Couldn\'t find the todo'
             ]);
-        $this->assertEquals(404, $this->response->getStatusCode());
+        $this->assertEquals(500, $this->response->getStatusCode());
     }
 
     public function testViewExistTodo()
@@ -91,7 +91,7 @@ class APITest extends TestCase {
         $response = $this->call('PUT', '/v1/todos/1', [
             'title' => 'Test Todo 1'
         ]);
-        $this->assertEquals(404, $this->response->getStatusCode());
+        $this->assertEquals(500, $this->response->getStatusCode());
         $this->assertEquals('application/json', $this->response->headers->get('Content-Type'));
     }
 
@@ -112,9 +112,9 @@ class APITest extends TestCase {
     {
         $this->json('DELETE', '/v1/todos/1')
             ->seeJson([
-                'error' => 'Not found.'
+                'message' => 'Couldn\'t find the todo'
             ]);
-        $this->assertEquals(404, $this->response->getStatusCode());
+        $this->assertEquals(500, $this->response->getStatusCode());
     }
 
     public function testDeleteTodoSuccessfully()
@@ -133,9 +133,9 @@ class APITest extends TestCase {
     {
         $this->json('POST', '/v1/todos/1/move', ['prior_sibling_id' => 3])
             ->seeJson([
-                'error' => 'Not found.'
+                'message' => 'Couldn\'t find the todo'
             ]);
-        $this->assertEquals(404, $this->response->getStatusCode());
+        $this->assertEquals(500, $this->response->getStatusCode());
     }
 
     public function testMoveTodoSuccess()
