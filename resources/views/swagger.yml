@@ -32,9 +32,10 @@
           200:
             description: "A list of todos."
             schema:
+              title: "ArrayOfTodo"
               type: "array"
               items:
-                - $ref: "#/definitions/Todo"
+                $ref: "#/definitions/Todo"
           default:
             description: "Unexpected error"
             schema:
@@ -47,16 +48,36 @@
         produces:
           - "application/json"
         parameters:
-          - name: "body"
-            in: "body"
-            description: "todo param"
-            schema:
-              $ref: "#/definitions/TodoRequest"
+          - name: "title"
+            in: "formData"
+            description: "Title of the todo"
+            required: true
+            type: string
+          - name: "todo_groups_id"
+            in: "formData"
+            description: "Id of todo group"
+            type: integer
+          - name: "color"
+            in: "formData"
+            description: "Color of the todo"
+            type: string
+          - name: "due_date"
+            in: "formData"
+            description: "Expire date of the todo"
+            type: string
+          - name: "marked"
+            in: "formData"
+            description: "Mark the todo as done"
+            type: boolean
         responses:
           200:
             description: "A todo record added"
             schema:
               $ref: "#/definitions/Todo"
+          422:
+            description: "Missing parameters"
+            schema:
+              $ref: "#/definitions/ErrorMissingField"
           default:
             description: "Unexpected error"
             schema:
@@ -80,6 +101,10 @@
             description: "A todo record."
             schema:
               $ref: "#/definitions/Todo"
+          500:
+            description: "Couldn't find the todo"
+            schema:
+              $ref: "#/definitions/Error"
           default:
             description: "Unexpected error"
             schema:
@@ -92,11 +117,23 @@
         produces:
           - "application/json"
         parameters:
-          - name: "body"
-            in: "body"
-            description: "todo param"
-            schema:
-              $ref: "#/definitions/TodoRequest"
+          - name: "title"
+            in: "formData"
+            description: "Title of the todo"
+            required: true
+            type: string
+          - name: "color"
+            in: "formData"
+            description: "Color of the todo"
+            type: string
+          - name: "due_date"
+            in: "formData"
+            description: "Expire date of the todo"
+            type: string
+          - name: "marked"
+            in: "formData"
+            description: "Mark the todo as done"
+            type: boolean
           - name: "id"
             in: "path"
             description: "todo id"
@@ -107,6 +144,14 @@
             description: "A todo record."
             schema:
               $ref: "#/definitions/Todo"
+          422:
+            description: "Missing parameters"
+            schema:
+              $ref: "#/definitions/ErrorMissingField"
+          500:
+            description: "Couldn't find the todo"
+            schema:
+              $ref: "#/definitions/Error"
           default:
             description: "Unexpected error"
             schema:
@@ -129,6 +174,10 @@
             description: "The deleted record."
             schema:
               $ref: "#/definitions/Todo"
+          500:
+            description: "Couldn't find the todo"
+            schema:
+              $ref: "#/definitions/Error"
           default:
             description: "Unexpected error"
             schema:
@@ -147,7 +196,6 @@
           - name: "prior_sibling_id"
             in: "formData"
             description: "Id of prior sibling Todo"
-            required: true
             type: "number"
           - name: "id"
             in: "path"
@@ -159,35 +207,40 @@
             description: "A todo record added"
             schema:
               $ref: "#/definitions/Todo"
-          404:
-            description: "Not Found"
+          500:
+            description: "Couldn't find the todo"
             schema:
-              $ref: "#/definitions/Todo"
+              $ref: "#/definitions/Error"
           default:
             description: "Unexpected error"
             schema:
               $ref: "#/definitions/Error"
   definitions:
-    TodoRequest:
-      type: "object"
+    Todo:
+      type: object
       properties:
         title:
-          type: "string"
-        due_date:
-          type: "string"
-          format: "date"
+          type: string
+        todo_groups_id:
+          type: string
         color:
-          type: "string"
+          type: string
+        due_date:
+          type: string
+          format: date
+        sort_order:
+          type: integer
         marked:
-          type: "boolean"
-    Todo:
-      "allOf":
-        - $ref: "#/definitions/TodoRequest"
-        - properties:
-            id:
-              type: "number"
+          type: boolean
     Error:
       type: "object"
       properties:
-        error:
+        message:
           type: "string"
+    ErrorMissingField:
+      type: object
+      properties:
+        title:
+          type: array
+          items:
+            type: string
