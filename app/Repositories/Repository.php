@@ -65,11 +65,8 @@ abstract class Repository implements RepositoryInterface
      */
     public function get($id)
     {
-        $record = $this->model->find($id);
-        if ($record) {
-            return $record;
-        }
-        return false;
+        $record = $this->model->findOrFail($id);
+        return $record;
     }
 
     /**
@@ -110,8 +107,8 @@ abstract class Repository implements RepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $record = $this->model->find($id);
-            if ($record && $record->update($data)) {
+            $record = $this->model->findOrFail($id);
+            if ($record->update($data)) {
                 DB::commit();
                 return $record;
             }
@@ -132,7 +129,7 @@ abstract class Repository implements RepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $record = $this->model->find($id);
+            $record = $this->model->findOrFail($id);
             if ($record && $record->delete()) {
                 if ($this->sortField) {
                     $this->model->where($this->sortField, '>', $record->{$this->sortField})
@@ -159,7 +156,7 @@ abstract class Repository implements RepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $record = $this->model->find($id);
+            $record = $this->model->findOrFail($id);
             if ($record) {
                 // Get prior sibling record's order
                 $priorOrder = $this->getOrder($priorSiblingId);

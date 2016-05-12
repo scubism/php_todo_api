@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class TodosController extends Controller
 {
-    // TODO Add Middleware to check todo exist
     private $todoRepo;
 
     /**
@@ -20,12 +19,6 @@ class TodosController extends Controller
     {
         // Construct
         $this->todoRepo = $todoRepo;
-
-        $this->middleware('check_exist:\App\DataAccess\Eloquent\Todo', [
-            'only' => [
-                'viewTodo', 'updateTodo', 'deleteTodo', 'moveTodo'
-            ]
-        ]);
     }
 
     public function index()
@@ -44,10 +37,7 @@ class TodosController extends Controller
     public function viewTodo($id)
     {
         $result = $this->todoRepo->get($id);
-        if ($result) {
-            return $result;
-        }
-        return response(['message' => 'Couldn\'t find the Todo'], 500);
+        return $result;
     }
 
     public function createTodo(Request $request)
@@ -67,12 +57,11 @@ class TodosController extends Controller
         if ($created) {
             return $created;
         }
-        return response(['message' => 'Couldn\'t create Todo'], 500);
+        return response(['message' => 'Couldn\'t create Todo'], 400);
     }
 
     public function updateTodo($id, Request $request)
     {
-        // TODO Check exist in middleware
         $this->validate($request, [
             'title' => 'required'
         ]);
@@ -88,7 +77,7 @@ class TodosController extends Controller
         if ($updated) {
             return $updated;
         }
-        return response(['message' => 'Couldn\'t update the Todo'], 500);
+        return response(['message' => 'Couldn\'t update the Todo'], 400);
     }
 
     public function deleteTodo($id)
@@ -97,7 +86,7 @@ class TodosController extends Controller
         if ($deleted) {
             return $deleted;
         }
-        return response(['message' => 'Couldn\'t delete the Todo'], 500);
+        return response(['message' => 'Couldn\'t delete the Todo'], 400);
     }
 
     public function moveTodo($id, Request $request)
@@ -106,6 +95,6 @@ class TodosController extends Controller
         if ($moved) {
             return $moved;
         }
-        return response(['message' => 'Couldn\'t move the Todo'], 500);
+        return response(['message' => 'Couldn\'t move the Todo'], 400);
     }
 }

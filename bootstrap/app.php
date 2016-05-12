@@ -63,10 +63,6 @@ $app->singleton(
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
 
-$app->routeMiddleware([
-    'check_exist' => App\Http\Middleware\CheckRecordExistMiddleware::class,
-]);
-
 $app->middleware([
     Vluzrmos\LumenCors\CorsMiddleware::class,
     App\Http\Middleware\AddTodoGroupMiddleware::class
