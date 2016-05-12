@@ -21,7 +21,7 @@ class TodosController extends Controller
         // Construct
         $this->todoRepo = $todoRepo;
 
-        $this->middleware('check_exist:\App\Models\Todo', [
+        $this->middleware('check_exist:\App\DataAccess\Eloquent\Todo', [
             'only' => [
                 'viewTodo', 'updateTodo', 'deleteTodo', 'moveTodo'
             ]

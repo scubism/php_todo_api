@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Todo;
+use App\DataAccess\Eloquent\Todo;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Artisan as Artisan;
 
@@ -11,7 +11,7 @@ class APITest extends TestCase {
 
     public function testListTodosWithData()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $this->call('GET', '/v1/todos');
 
         $this->assertResponseOk();
@@ -39,7 +39,7 @@ class APITest extends TestCase {
 
     public function testViewExistTodo()
     {
-        factory(App\Models\Todo::class, 1)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, 1)->create();
 
         $this->json('GET', "/v1/todos/1")
             ->seeJson([
@@ -70,7 +70,7 @@ class APITest extends TestCase {
 
     public function testCreateTodoSuccessfully()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $this->json('POST', '/v1/todos', [
                 'title' => 'Test Todo 1',
                 'todo_groups_id' => '1'
@@ -97,7 +97,7 @@ class APITest extends TestCase {
 
     public function testUpdateTodoSuccess()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $title = 'Test Todo 1 Updated';
         $this->json('PUT', '/v1/todos/1', [
                 'title' => $title
@@ -119,7 +119,7 @@ class APITest extends TestCase {
 
     public function testDeleteTodoSuccessfully()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $this->call('DELETE', '/v1/todos/1');
         $this->assertResponseOk();
         $this->assertEquals('application/json', $this->response->headers->get('Content-Type'));
@@ -140,7 +140,7 @@ class APITest extends TestCase {
 
     public function testMoveTodoSuccess()
     {
-        $todos = factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->make()->toArray();
+        $todos = factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->make()->toArray();
 
         foreach ($todos as $todo) {
             $this->json('POST', '/v1/todos', $todo);

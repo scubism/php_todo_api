@@ -29,6 +29,6 @@ class TodoRepository extends Repository
      */
     public function model()
     {
-        return \App\Models\Todo::class;
+        return \App\DataAccess\Eloquent\Todo::class;
     }
 }

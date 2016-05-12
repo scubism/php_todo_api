@@ -11,7 +11,7 @@
 |
 */
 
-$factory->define(App\Models\Todo::class, function ($faker) {
+$factory->define(App\DataAccess\Eloquent\Todo::class, function ($faker) {
     return [
         'title' => $faker->sentence(4, true),
         'color' => $faker->hexcolor,

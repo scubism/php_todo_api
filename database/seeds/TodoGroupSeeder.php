@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Models\TodoGroup;
+use App\DataAccess\Eloquent\TodoGroup;
 
 class TodoGroupSeeder extends Seeder
 {
