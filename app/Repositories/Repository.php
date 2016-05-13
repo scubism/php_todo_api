@@ -73,26 +73,25 @@ abstract class Repository implements RepositoryInterface
      * Create a record
      *
      * @param  array  $data
+     * @param object/bool $result
      *
-     * @return object/bool
+     * @return object/bool $result
      */
-    public function create(array $data)
+    public function create(array $data, $result = null)
     {
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($data, &$result) {
             if ($this->sortField) {
                 $maxOrder = $this->getMaxOrder();
                 $data[$this->sortField] = $maxOrder + 1;
             }
             $record = $this->model->create($data);
-            if ($record) {
-                DB::commit();
-                return $record;
+            if (!$record) {
+                $result = false;
+            } else {
+                $result = $record;
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-        }
-        return false;
+        });
+        return $result;
     }
 
     /**
@@ -100,48 +99,48 @@ abstract class Repository implements RepositoryInterface
      *
      * @param  array $data
      * @param  int $id
+     * @param object/bool $result
      *
-     * @return object/bool Updated record / false if update failed
+     * @return object/bool $result Updated record / false if update failed
      */
-    public function update(array $data, $id)
+    public function update(array $data, $id, $result = null)
     {
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($data, $id, &$result) {
             $record = $this->model->findOrFail($id);
-            if ($record->update($data)) {
-                DB::commit();
-                return $record;
+            if (!$record->update($data)) {
+                $result = false;
+            } else {
+                $result = $record;
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-        }
-        return false;
+        });
+
+        return $result;
     }
 
     /**
      * Delete a record
      *
      * @param  int $id Id of record for deleting
+     * @param object/bool $result
      *
-     * @return object/bool Deleted record / false if delete failed
+     * @return object/bool $result Deleted record / false if delete failed
      */
-    public function delete($id)
+    public function delete($id, $result = null)
     {
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($id, &$result) {
             $record = $this->model->findOrFail($id);
             if ($record && $record->delete()) {
                 if ($this->sortField) {
                     $this->model->where($this->sortField, '>', $record->{$this->sortField})
                         ->decrement($this->sortField, 1);
                 }
-                DB::commit();
-                return $record;
+                $result = $record;
+            } else {
+                $result = false;
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-        }
-        return false;
+        });
+
+        return $result;
     }
 
     /**
@@ -149,13 +148,13 @@ abstract class Repository implements RepositoryInterface
      *
      * @param  int $id Id of record
      * @param  int $priorSiblingId Id of record upper than current record
+     * @param object/bool $result
      *
-     * @return object/bool moved record /false if move failed
+     * @return object/bool $result moved record /false if move failed
      */
-    public function move($id, $priorSiblingId)
+    public function move($id, $priorSiblingId, $result = null)
     {
-        DB::beginTransaction();
-        try {
+        DB::transaction(function () use ($id, $priorSiblingId, &$result) {
             $record = $this->model->findOrFail($id);
             if ($record) {
                 // Get prior sibling record's order
@@ -177,13 +176,13 @@ abstract class Repository implements RepositoryInterface
                         ->where('id', '!=', $id)
                         ->decrement($this->sortField, 1);
                 }
-                DB::commit();
-                return $record;
+                $result = $record;
+            } else {
+                $result = false;
             }
-        } catch (Exception $e) {
-            DB::rollBack();
-        }
-        return false;
+        });
+
+        return $result;
     }
 
     /**

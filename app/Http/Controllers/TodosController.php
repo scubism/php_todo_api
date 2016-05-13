@@ -45,6 +45,7 @@ class TodosController extends Controller
         $this->validate($request, [
             'title' => 'required'
         ]);
+
         $data = [
             'title' => $request->input('title'),
             'due_date' => $request->input('due_date', null),
@@ -54,10 +55,10 @@ class TodosController extends Controller
         ];
 
         $created = $this->todoRepo->create($data);
-        if ($created) {
-            return $created;
+        if (!$created) {
+            return response(['message' => 'Couldn\'t create Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t create Todo'], 400);
+        return $created;
     }
 
     public function updateTodo($id, Request $request)
@@ -74,27 +75,27 @@ class TodosController extends Controller
         ];
 
         $updated = $this->todoRepo->update($data, $id);
-        if ($updated) {
-            return $updated;
+        if (!$updated) {
+            return response(['message' => 'Couldn\'t update the Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t update the Todo'], 400);
+        return $updated;
     }
 
     public function deleteTodo($id)
     {
         $deleted = $this->todoRepo->delete($id);
-        if ($deleted) {
-            return $deleted;
+        if (!$deleted) {
+            return response(['message' => 'Couldn\'t delete the Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t delete the Todo'], 400);
+        return $deleted;
     }
 
     public function moveTodo($id, Request $request)
     {
         $moved = $this->todoRepo->move($id, $request->input('prior_sibling_id', ''));
-        if ($moved) {
-            return $moved;
+        if (!$moved) {
+            return response(['message' => 'Couldn\'t move the Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t move the Todo'], 400);
+        return $moved;
     }
 }

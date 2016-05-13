@@ -52,7 +52,7 @@ class APITest extends TestCase {
     {
         $this->json('POST', '/v1/todos', [])
             ->seeJson([
-                "message" => ["The title field is required."]
+                "message" => "The title field is required."
             ]);
         $this->assertEquals(400, $this->response->getStatusCode());
     }
@@ -63,7 +63,7 @@ class APITest extends TestCase {
                 'todo_groups_id' => '1'
             ])
             ->seeJson([
-                "message" => ["The title field is required."]
+                "message" => "The title field is required."
             ]);
         $this->assertEquals(400, $this->response->getStatusCode());
     }

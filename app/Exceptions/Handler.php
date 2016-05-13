@@ -13,7 +13,12 @@ use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
-    const VALIDATION_MISSING_TYPE = 'missing_field';
+     /**
+     * The cache of snake-cased words.
+     *
+     * @var array
+     */
+    protected static $snakeCache = [];
 
     /**
      * A list of the exception types that should not be reported.
@@ -33,6 +38,7 @@ class Handler extends ExceptionHandler
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
      * @param  \Exception  $e
+     *
      * @return void
      */
     public function report(Exception $e)
@@ -45,6 +51,7 @@ class Handler extends ExceptionHandler
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $e
+     *
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $e)
@@ -54,39 +61,66 @@ class Handler extends ExceptionHandler
         ];
 
         if ($e instanceof ValidationException) {
-            $messages = $e->validator->messages()->toArray();
             $errors = [];
-            foreach ($messages as $key => $value) {
-                $error = [
-                    'code' => self::VALIDATION_MISSING_TYPE,
-                    'field' => $key,
-                    'message' => $value
+            $types = $e->validator->failed();
+            foreach ($types as $field => $type) {
+                $errors[] = [
+                    'field' => $field,
+                    'code' => self::snake(current(array_keys($type))),
+                    'message' => $e->validator->messages()->first($field)
                 ];
-                $errors[] = $error;
             }
             $response['errors'] = $errors;
-
             return response()->json($response, Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($e instanceof QueryException) {
+        } else if($e instanceof QueryException) {
             $response['message'] = 'Could\'nt Create/Update';
             return response()->json($response, Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($e instanceof \PDOException) {
+        } else if ($e instanceof \PDOException) {
             $response['message'] = 'DB Connection Error';
             return response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        if ($e instanceof HttpException) {
+        } else if ($e instanceof HttpException) {
             $response['message'] = Response::$statusTexts[$e->getStatusCode()];
             return response()->json($response, $e->getStatusCode());
         } else if ($e instanceof ModelNotFoundException) {
             $response['message'] = 'Not Found';
             return response()->json($response, Response::HTTP_NOT_FOUND);
+        } else {
+            if ($_ENV['APP_DEBUG']) {
+                return parent::render($request, $e);
+            }
+            abort(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
 
-        return $response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);
+    /**
+     * Convert a string to snake case.
+     *
+     * @param  string  $value
+     * @param  string  $delimiter
+     *
+     * @return string
+     */
+    private static function snake($value, $delimiter = '_')
+    {
+        $key = $value.$delimiter;
+        if (isset(static::$snakeCache[$key])) {
+            return static::$snakeCache[$key];
+        }
+        if (! ctype_lower($value)) {
+            $value = preg_replace('/\s+/u', '', $value);
+            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
+        }
+        return static::$snakeCache[$key] = $value;
+    }
+
+    /**
+     * Convert the given string to lower-case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    private static function lower($value)
+    {
+        return mb_strtolower($value, 'UTF-8');
     }
 }
