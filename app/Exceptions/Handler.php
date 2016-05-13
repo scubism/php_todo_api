@@ -6,12 +6,15 @@ use Exception;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
+    const VALIDATION_MISSING_TYPE = 'missing_field';
+
     /**
      * A list of the exception types that should not be reported.
      *
@@ -55,26 +58,35 @@ class Handler extends ExceptionHandler
             $errors = [];
             foreach ($messages as $key => $value) {
                 $error = [
-                    'code' => $key,
+                    'code' => self::VALIDATION_MISSING_TYPE,
+                    'field' => $key,
                     'message' => $value
                 ];
                 $errors[] = $error;
             }
             $response['errors'] = $errors;
 
-            return response()->json($response, 400);
+            return response()->json($response, Response::HTTP_BAD_REQUEST);
         }
 
-        if ($e instanceof ModelNotFoundException) {
-            $response['message'] = 'Not Found';
-            return response()->json($response, 404);
+        if ($e instanceof QueryException) {
+            $response['message'] = 'Could\'nt Create/Update';
+            return response()->json($response, Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($e instanceof \PDOException) {
+            $response['message'] = 'DB Connection Error';
+            return response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         if ($e instanceof HttpException) {
             $response['message'] = Response::$statusTexts[$e->getStatusCode()];
             return response()->json($response, $e->getStatusCode());
+        } else if ($e instanceof ModelNotFoundException) {
+            $response['message'] = 'Not Found';
+            return response()->json($response, Response::HTTP_NOT_FOUND);
         }
 
-        return $response()->json($response, 500);
+        return $response()->json($response, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
