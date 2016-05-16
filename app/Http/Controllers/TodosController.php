@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\TodoRepository;
+use App\Repositories\Eloquents\TodoRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,6 +21,12 @@ class TodosController extends Controller
         $this->todoRepo = $todoRepo;
     }
 
+    /**
+     * Action for route GET /
+     * For API working check
+     *
+     * @return JsonResponse
+     */
     public function index()
     {
         $response = [
@@ -29,17 +35,37 @@ class TodosController extends Controller
         return new JsonResponse($response, 200);
     }
 
+    /**
+     * Action for route GET /v1/todos/
+     * Get all todo from database
+     *
+     * @return array
+     */
     public function indexTodos()
     {
         return $this->todoRepo->all();
     }
 
+    /**
+     * Action for route GET /v1/todos/{id}
+     * Get only one todo by its id
+     *
+     * @param  int $id Todo Id
+     *
+     * @return object
+     */
     public function viewTodo($id)
     {
-        $result = $this->todoRepo->get($id);
-        return $result;
+        return $this->todoRepo->find($id);
     }
 
+    /**
+     * Action for route POST /v1/todos
+     *
+     * @param  Request $request New Todo data
+     *
+     * @return object/json
+     */
     public function createTodo(Request $request)
     {
         $this->validate($request, [
@@ -54,13 +80,22 @@ class TodosController extends Controller
             'marked' => $request->input('marked', 0)
         ];
 
-        $created = $this->todoRepo->create($data);
-        if (!$created) {
+        $todo = $this->todoRepo->create($data);
+        if (!$todo) {
             return response(['message' => 'Couldn\'t create Todo'], 400);
         }
-        return $created;
+        return $todo;
     }
 
+    /**
+     * Action for PUT /v1/todos/{id}
+     * Update a todo
+     *
+     * @param  int  $id      Todo Id
+     * @param  Request $request New Todo data
+     *
+     * @return object/json
+     */
     public function updateTodo($id, Request $request)
     {
         $this->validate($request, [
@@ -74,28 +109,46 @@ class TodosController extends Controller
             'marked' => $request->input('marked', 0)
         ];
 
-        $updated = $this->todoRepo->update($data, $id);
-        if (!$updated) {
+        $todo = $this->todoRepo->update($data, $id);
+        if (!$todo) {
             return response(['message' => 'Couldn\'t update the Todo'], 400);
         }
-        return $updated;
+        return $todo;
     }
 
+    /**
+     * Action for DELETE /v1/todos/{id}
+     * Delete a todo
+     *
+     * @param  int $id Todo Id
+     *
+     * @return object/json
+     */
     public function deleteTodo($id)
     {
-        $deleted = $this->todoRepo->delete($id);
-        if (!$deleted) {
+        $todo = $this->todoRepo->delete($id);
+        if (!$todo) {
             return response(['message' => 'Couldn\'t delete the Todo'], 400);
         }
-        return $deleted;
+        return $todo;
     }
 
+    /**
+     * Action for POST /v1/todos/{id}/move
+     * Move a todo right after another todo
+     *
+     * @param  int  $id      Todo Id
+     * @param  Request $request New Todo Data
+     *
+     * @return object/json
+     */
     public function moveTodo($id, Request $request)
     {
-        $moved = $this->todoRepo->move($id, $request->input('prior_sibling_id', ''));
-        if (!$moved) {
+        $priorSiblingId = $request->input('prior_sibling_id', '');
+        $todo = $this->todoRepo->move($id, $priorSiblingId);
+        if (!$todo) {
             return response(['message' => 'Couldn\'t move the Todo'], 400);
         }
-        return $moved;
+        return $todo;
     }
 }

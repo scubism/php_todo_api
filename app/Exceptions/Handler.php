@@ -10,15 +10,10 @@ use Illuminate\Database\QueryException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
+use App\Utils\StringManipulation;
 
 class Handler extends ExceptionHandler
 {
-     /**
-     * The cache of snake-cased words.
-     *
-     * @var array
-     */
-    protected static $snakeCache = [];
 
     /**
      * A list of the exception types that should not be reported.
@@ -66,13 +61,13 @@ class Handler extends ExceptionHandler
             foreach ($types as $field => $type) {
                 $errors[] = [
                     'field' => $field,
-                    'code' => self::snake(current(array_keys($type))),
+                    'code' => StringManipulation::snake(current(array_keys($type))),
                     'message' => $e->validator->messages()->first($field)
                 ];
             }
             $response['errors'] = $errors;
             return response()->json($response, Response::HTTP_BAD_REQUEST);
-        } else if($e instanceof QueryException) {
+        } else if ($e instanceof QueryException) {
             $response['message'] = 'Could\'nt Create/Update';
             return response()->json($response, Response::HTTP_BAD_REQUEST);
         } else if ($e instanceof \PDOException) {
@@ -90,37 +85,5 @@ class Handler extends ExceptionHandler
             }
             abort(Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    /**
-     * Convert a string to snake case.
-     *
-     * @param  string  $value
-     * @param  string  $delimiter
-     *
-     * @return string
-     */
-    private static function snake($value, $delimiter = '_')
-    {
-        $key = $value.$delimiter;
-        if (isset(static::$snakeCache[$key])) {
-            return static::$snakeCache[$key];
-        }
-        if (! ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', $value);
-            $value = static::lower(preg_replace('/(.)(?=[A-Z])/u', '$1'.$delimiter, $value));
-        }
-        return static::$snakeCache[$key] = $value;
-    }
-
-    /**
-     * Convert the given string to lower-case.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    private static function lower($value)
-    {
-        return mb_strtolower($value, 'UTF-8');
     }
 }
