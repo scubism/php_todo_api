@@ -4,10 +4,15 @@ namespace App\DataAccess\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use \Rutorika\Sortable\SortableTrait;
 
 class Todo extends Model
 {
     use SoftDeletes;
+
+    use SortableTrait;
+
+    protected static $sortableField = 'sort_order';
 
     /**
      * The database table used by the model.
@@ -15,6 +20,20 @@ class Todo extends Model
      * @var string
      */
     public $table = 'todos';
+
+    /**
+     * The "booting" method of the model.
+     *
+     * @return void
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        Todo::deleting(function ($model) {
+            $model->next()->decrement(self::$sortableField);
+        });
+    }
 
     /**
      * The attributes excluded from the model query

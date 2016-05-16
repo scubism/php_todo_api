@@ -41,7 +41,7 @@ class APITest extends TestCase {
     {
         factory(App\DataAccess\Eloquent\Todo::class, 1)->create();
 
-        $this->json('GET', "/v1/todos/1")
+        $this->json('GET', '/v1/todos/1')
             ->seeJson([
                 'id' => 1
             ]);
@@ -52,7 +52,7 @@ class APITest extends TestCase {
     {
         $this->json('POST', '/v1/todos', [])
             ->seeJson([
-                "message" => "The title field is required."
+                'message' => 'The title field is required.'
             ]);
         $this->assertEquals(400, $this->response->getStatusCode());
     }
@@ -63,7 +63,7 @@ class APITest extends TestCase {
                 'todo_groups_id' => '1'
             ])
             ->seeJson([
-                "message" => "The title field is required."
+                'message' => 'The title field is required.'
             ]);
         $this->assertEquals(400, $this->response->getStatusCode());
     }
@@ -150,7 +150,7 @@ class APITest extends TestCase {
         $this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => ''])
             ->seeJson([
                 'id' => 3,
-                'sort_order' => 1
+                'sort_order' => '1'
             ]);
         $responseTodo2 = $this->call('GET', '/v1/todos/2');
         $jsonTodo2 = json_decode($responseTodo2->getContent());
@@ -171,7 +171,7 @@ class APITest extends TestCase {
         $this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => 2])
             ->seeJson([
                 'id' => 3,
-                'sort_order' => $sort_orderTodo2
+                'sort_order' => intval($sort_orderTodo2)
             ]);
     }
 }

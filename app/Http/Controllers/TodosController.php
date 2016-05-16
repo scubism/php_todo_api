@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Repositories\Eloquents\TodoRepository;
+use App\Repositories\TodoRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

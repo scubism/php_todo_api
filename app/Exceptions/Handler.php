@@ -7,10 +7,10 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpFoundation\Response;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
-use App\Utils\StringManipulation;
 
 class Handler extends ExceptionHandler
 {
@@ -61,7 +61,7 @@ class Handler extends ExceptionHandler
             foreach ($types as $field => $type) {
                 $errors[] = [
                     'field' => $field,
-                    'code' => StringManipulation::snake(current(array_keys($type))),
+                    'code' => Str::snake(current(array_keys($type))),
                     'message' => $e->validator->messages()->first($field)
                 ];
             }
