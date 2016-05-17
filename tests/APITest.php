@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Todo;
+use App\DataAccess\Eloquent\Todo;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Artisan as Artisan;
 
@@ -11,7 +11,7 @@ class APITest extends TestCase {
 
     public function testListTodosWithData()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $this->call('GET', '/v1/todos');
 
         $this->assertResponseOk();
@@ -32,16 +32,16 @@ class APITest extends TestCase {
     {
         $this->json('GET', '/v1/todos/1')
             ->seeJson([
-                'message' => 'Couldn\'t find the todo'
+                'message' => 'Not Found'
             ]);
-        $this->assertEquals(500, $this->response->getStatusCode());
+        $this->assertEquals(404, $this->response->getStatusCode());
     }
 
     public function testViewExistTodo()
     {
-        factory(App\Models\Todo::class, 1)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, 1)->create();
 
-        $this->json('GET', "/v1/todos/1")
+        $this->json('GET', '/v1/todos/1')
             ->seeJson([
                 'id' => 1
             ]);
@@ -52,9 +52,9 @@ class APITest extends TestCase {
     {
         $this->json('POST', '/v1/todos', [])
             ->seeJson([
-                "title" => ["The title field is required."]
+                'message' => 'The title field is required.'
             ]);
-        $this->assertEquals(422, $this->response->getStatusCode());
+        $this->assertEquals(400, $this->response->getStatusCode());
     }
 
     public function testCreateTodoWithMissingTitle()
@@ -63,14 +63,14 @@ class APITest extends TestCase {
                 'todo_groups_id' => '1'
             ])
             ->seeJson([
-                "title" => ["The title field is required."]
+                'message' => 'The title field is required.'
             ]);
-        $this->assertEquals(422, $this->response->getStatusCode());
+        $this->assertEquals(400, $this->response->getStatusCode());
     }
 
     public function testCreateTodoSuccessfully()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $this->json('POST', '/v1/todos', [
                 'title' => 'Test Todo 1',
                 'todo_groups_id' => '1'
@@ -91,13 +91,13 @@ class APITest extends TestCase {
         $response = $this->call('PUT', '/v1/todos/1', [
             'title' => 'Test Todo 1'
         ]);
-        $this->assertEquals(500, $this->response->getStatusCode());
+        $this->assertEquals(404, $this->response->getStatusCode());
         $this->assertEquals('application/json', $this->response->headers->get('Content-Type'));
     }
 
     public function testUpdateTodoSuccess()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $title = 'Test Todo 1 Updated';
         $this->json('PUT', '/v1/todos/1', [
                 'title' => $title
@@ -112,14 +112,14 @@ class APITest extends TestCase {
     {
         $this->json('DELETE', '/v1/todos/1')
             ->seeJson([
-                'message' => 'Couldn\'t find the todo'
+                'message' => 'Not Found'
             ]);
-        $this->assertEquals(500, $this->response->getStatusCode());
+        $this->assertEquals(404, $this->response->getStatusCode());
     }
 
     public function testDeleteTodoSuccessfully()
     {
-        factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $this->call('DELETE', '/v1/todos/1');
         $this->assertResponseOk();
         $this->assertEquals('application/json', $this->response->headers->get('Content-Type'));
@@ -133,14 +133,14 @@ class APITest extends TestCase {
     {
         $this->json('POST', '/v1/todos/1/move', ['prior_sibling_id' => 3])
             ->seeJson([
-                'message' => 'Couldn\'t find the todo'
+                'message' => 'Not Found'
             ]);
-        $this->assertEquals(500, $this->response->getStatusCode());
+        $this->assertEquals(404, $this->response->getStatusCode());
     }
 
     public function testMoveTodoSuccess()
     {
-        $todos = factory(App\Models\Todo::class, APITest::DEFAULT_TODO_NUMBER)->make()->toArray();
+        $todos = factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->make()->toArray();
 
         foreach ($todos as $todo) {
             $this->json('POST', '/v1/todos', $todo);
@@ -150,7 +150,7 @@ class APITest extends TestCase {
         $this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => ''])
             ->seeJson([
                 'id' => 3,
-                'sort_order' => 1
+                'sort_order' => '1'
             ]);
         $responseTodo2 = $this->call('GET', '/v1/todos/2');
         $jsonTodo2 = json_decode($responseTodo2->getContent());
@@ -171,7 +171,7 @@ class APITest extends TestCase {
         $this->json('POST', '/v1/todos/3/move', ['prior_sibling_id' => 2])
             ->seeJson([
                 'id' => 3,
-                'sort_order' => $sort_orderTodo2
+                'sort_order' => intval($sort_orderTodo2)
             ]);
     }
 }

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class TodosController extends Controller
 {
-    // TODO Add Middleware to check todo exist
     private $todoRepo;
 
     /**
@@ -20,14 +19,14 @@ class TodosController extends Controller
     {
         // Construct
         $this->todoRepo = $todoRepo;
-
-        $this->middleware('check_exist:\App\Models\Todo', [
-            'only' => [
-                'viewTodo', 'updateTodo', 'deleteTodo', 'moveTodo'
-            ]
-        ]);
     }
 
+    /**
+     * Action for route GET /
+     * For API working check
+     *
+     * @return JsonResponse
+     */
     public function index()
     {
         $response = [
@@ -36,25 +35,43 @@ class TodosController extends Controller
         return new JsonResponse($response, 200);
     }
 
+    /**
+     * Action for route GET /v1/todos/
+     * Get all todo from database
+     *
+     * @return array
+     */
     public function indexTodos()
     {
         return $this->todoRepo->all();
     }
 
+    /**
+     * Action for route GET /v1/todos/{id}
+     * Get only one todo by its id
+     *
+     * @param  int $id Todo Id
+     *
+     * @return object
+     */
     public function viewTodo($id)
     {
-        $result = $this->todoRepo->get($id);
-        if ($result) {
-            return $result;
-        }
-        return response(['message' => 'Couldn\'t find the Todo'], 500);
+        return $this->todoRepo->find($id);
     }
 
+    /**
+     * Action for route POST /v1/todos
+     *
+     * @param  Request $request New Todo data
+     *
+     * @return object/json
+     */
     public function createTodo(Request $request)
     {
         $this->validate($request, [
             'title' => 'required'
         ]);
+
         $data = [
             'title' => $request->input('title'),
             'due_date' => $request->input('due_date', null),
@@ -64,15 +81,23 @@ class TodosController extends Controller
         ];
 
         $created = $this->todoRepo->create($data);
-        if ($created) {
-            return $created;
+        if (!$created) {
+            return response(['message' => 'Couldn\'t create Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t create Todo'], 500);
+        return $created;
     }
 
+    /**
+     * Action for PUT /v1/todos/{id}
+     * Update a todo
+     *
+     * @param  int  $id      Todo Id
+     * @param  Request $request New Todo data
+     *
+     * @return object/json
+     */
     public function updateTodo($id, Request $request)
     {
-        // TODO Check exist in middleware
         $this->validate($request, [
             'title' => 'required'
         ]);
@@ -85,27 +110,45 @@ class TodosController extends Controller
         ];
 
         $updated = $this->todoRepo->update($data, $id);
-        if ($updated) {
-            return $updated;
+        if (!$updated) {
+            return response(['message' => 'Couldn\'t update the Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t update the Todo'], 500);
+        return $updated;
     }
 
+    /**
+     * Action for DELETE /v1/todos/{id}
+     * Delete a todo
+     *
+     * @param  int $id Todo Id
+     *
+     * @return object/json
+     */
     public function deleteTodo($id)
     {
         $deleted = $this->todoRepo->delete($id);
-        if ($deleted) {
-            return $deleted;
+        if (!$deleted) {
+            return response(['message' => 'Couldn\'t delete the Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t delete the Todo'], 500);
+        return $deleted;
     }
 
+    /**
+     * Action for POST /v1/todos/{id}/move
+     * Move a todo right after another todo
+     *
+     * @param  int  $id      Todo Id
+     * @param  Request $request New Todo Data
+     *
+     * @return object/json
+     */
     public function moveTodo($id, Request $request)
     {
-        $moved = $this->todoRepo->move($id, $request->input('prior_sibling_id', ''));
-        if ($moved) {
-            return $moved;
+        $priorSiblingId = $request->input('prior_sibling_id', '');
+        $moved = $this->todoRepo->move($id, $priorSiblingId);
+        if (!$moved) {
+            return response(['message' => 'Couldn\'t move the Todo'], 400);
         }
-        return response(['message' => 'Couldn\'t move the Todo'], 500);
+        return $moved;
     }
 }

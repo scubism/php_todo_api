@@ -63,10 +63,6 @@ $app->singleton(
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
 
-$app->routeMiddleware([
-    'check_exist' => App\Http\Middleware\CheckRecordExistMiddleware::class,
-]);
-
 $app->middleware([
     Vluzrmos\LumenCors\CorsMiddleware::class,
     App\Http\Middleware\AddTodoGroupMiddleware::class
@@ -86,6 +82,7 @@ $app->middleware([
 // $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\EventServiceProvider::class);
+$app->register(Prettus\Repository\Providers\LumenRepositoryServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------

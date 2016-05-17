@@ -1,0 +1,16 @@
+sudo: false
+
+language: php
+
+php:
+  - 7.0
+
+before_install:
+  - composer self-update
+
+install:
+  - composer install --dev --no-interaction
+
+script:
+  - vendor/bin/phpcs --standard=PSR2 --ignore=vendor/*,database,tests -n -p .
+  - vendor/bin/phpunit -c phpunit.xml

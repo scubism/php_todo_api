@@ -108,17 +108,18 @@ $app->get('profile', [
 Please read more in [Lumen Routing page](https://lumen.laravel.com/docs/5.2/routing)
 
 ### Create a model
-- Create a files in `app/Models`
+- Create a files in `app/DataAccess/Eloquent`
 ```
-touch app/Models/User.php
+mkdir -p app/DataAccess/Eloquent
+touch app/DataAccess/Eloquent/User.php
 ```
 
 - Sample model:
 ```
-# app/Models/User.php
+# app/DataAccess/Eloquent.php
 <?php
 
-namespace App\Models;
+namespace App\DataAccess\Eloquents;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -144,7 +145,7 @@ touch app/Http/Controllers/UsersController.php
 
 namespace App\Http\Controllers;
 
-use App\Models\User; # Use User model
+use App\DataAccess\Eloquent; # Use User model
 
 class UsersController extends Controller
 {
