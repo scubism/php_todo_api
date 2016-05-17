@@ -69,12 +69,17 @@ class TodoRepository extends BaseRepository
     public function move($id, $priorSiblingId)
     {
         $todo = $this->find($id);
+        $beforeOrder = $todo->sort_order;
         if (empty($priorSiblingId)) {
             $priorSibling = $this->model::sorted()->first();
             $todo->moveBefore($priorSibling);
         } else {
             $priorSibling = $this->find($priorSiblingId);
             $todo->moveAfter($priorSibling);
+        }
+        $afterOrder = $todo->sort_order;
+        if (intval($beforeOrder) === intval($afterOrder)) {
+            return false;
         }
         return $todo;
     }

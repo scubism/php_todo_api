@@ -80,11 +80,11 @@ class TodosController extends Controller
             'marked' => $request->input('marked', 0)
         ];
 
-        $todo = $this->todoRepo->create($data);
-        if (!$todo) {
+        $created = $this->todoRepo->create($data);
+        if (!$created) {
             return response(['message' => 'Couldn\'t create Todo'], 400);
         }
-        return $todo;
+        return $created;
     }
 
     /**
@@ -109,11 +109,11 @@ class TodosController extends Controller
             'marked' => $request->input('marked', 0)
         ];
 
-        $todo = $this->todoRepo->update($data, $id);
-        if (!$todo) {
+        $updated = $this->todoRepo->update($data, $id);
+        if (!$updated) {
             return response(['message' => 'Couldn\'t update the Todo'], 400);
         }
-        return $todo;
+        return $updated;
     }
 
     /**
@@ -126,11 +126,11 @@ class TodosController extends Controller
      */
     public function deleteTodo($id)
     {
-        $todo = $this->todoRepo->delete($id);
-        if (!$todo) {
+        $deleted = $this->todoRepo->delete($id);
+        if (!$deleted) {
             return response(['message' => 'Couldn\'t delete the Todo'], 400);
         }
-        return $todo;
+        return $deleted;
     }
 
     /**
@@ -145,10 +145,10 @@ class TodosController extends Controller
     public function moveTodo($id, Request $request)
     {
         $priorSiblingId = $request->input('prior_sibling_id', '');
-        $todo = $this->todoRepo->move($id, $priorSiblingId);
-        if (!$todo) {
+        $moved = $this->todoRepo->move($id, $priorSiblingId);
+        if (!$moved) {
             return response(['message' => 'Couldn\'t move the Todo'], 400);
         }
-        return $todo;
+        return $moved;
     }
 }
