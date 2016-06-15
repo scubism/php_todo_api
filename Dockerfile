@@ -1,13 +1,16 @@
-FROM scubism/php_api_base:latest
+FROM scubism/php7-nginx
 
-# === Set app specific settings ===
+WORKDIR /var/www/api
 
 COPY . .
 
-RUN composer install --no-dev
+RUN rm -f /etc/nginx/conf.d/default.conf && \
+    rm -rf /var/www/html
+
+COPY default.conf /etc/nginx/conf.d/default.conf
 
 COPY docker-entrypoint.sh /
 
-EXPOSE 9000
+RUN composer install --no-dev
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -1,43 +1,40 @@
 #!/bin/bash
 set -e
 
-usermod -u 1000 www-data
-
 ENV=${APP_ENV:-'local'}
 RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 FORCE=''
 
 if [ -f "/var/run/php-fpm.pid" ]; then
-   pid=`cat /var/run/php-fpm.pid`
-   if [ ! -z ${pid} ]; then
-     echo "PHP-FPM is running. Killing pid ${pid}"
-     kill ${pid}
-   fi
- fi
+  pid=`cat /var/run/php-fpm.pid`
+  if [ ! -z ${pid} ]; then
+    echo "PHP-FPM is running. Killing pid ${pid}"
+    kill -QUIT ${pid}
+  fi
+fi
+
+if [ -f "/var/run/nginx.pid" ]; then
+  pid=`cat /var/run/nginx.pid`
+  if [ ! -z ${pid} ]; then
+    echo "Nginx is running. Killing pid ${pid}"
+    kill -QUIT ${pid}
+  fi
+fi
 
 if [ $ENV == 'local' ]; then
   APP_DEBUG=true
-  if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
-    sed -i "s/daemonize = no/daemonize = yes/g" /usr/local/etc/php-fpm.d/zz-docker.conf
-  fi
-  mkdir -p /var/log/php-fpm
-  touch /var/log/php-fpm/error.log
-  touch /var/log/php-fpm/access.log
-  if [ -f "/usr/local/etc/php-fpm.d/docker.conf" ]; then
-    sed -i "s/error_log = \/proc\/self\/fd\/2/error_log = \/var\/log\/php-fpm\/error.log/g" /usr/local/etc/php-fpm.d/docker.conf
-    sed -i "s/access.log = \/proc\/self\/fd\/2/access.log = \/var\/log\/php-fpm\/access.log/g" /usr/local/etc/php-fpm.d/docker.conf
-  fi
   composer install # For install dev packages
+  if [ -L "/var/log/nginx/access.log" ]; then
+    unlink /var/log/nginx/access.log
+    touch /var/log/nginx/access.log
+  fi
+  if [ -L "/var/log/nginx/error.log" ]; then
+    unlink /var/log/nginx/error.log
+    touch /var/log/nginx/error.log
+  fi
 else
   APP_DEBUG=false
   FORCE='--force'
-  if [ -f "/usr/local/etc/php-fpm.d/zz-docker.conf" ]; then
-    sed -i "s/daemonize = yes/daemonize = no/g" /usr/local/etc/php-fpm.d/zz-docker.conf
-  fi
-  if [ -f "/usr/local/etc/php-fpm.d/docker.conf" ]; then
-    sed -i "s/error_log = \/var\/log\/php-fpm\/error.log/error_log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
-    sed -i "s/access.log = \/var\/log\/php-fpm\/access.log/access.log = \/proc\/self\/fd\/2/g" /usr/local/etc/php-fpm.d/docker.conf
-  fi
 fi
 
 if [ ! -f ".env" ]; then
@@ -53,11 +50,16 @@ if [ ! -f ".env" ]; then
     > .env
 fi
 
-chown -R www-data:www-data /var/www/html
-chmod 777 -R /var/www/html/storage
+touch /var/www/api/storage/logs/lumen.log
+chown -R nginx:nginx /var/www/api
+chmod 777 -R /var/www/api/storage
 
 composer dump-autoload
 php artisan migrate ${FORCE} & wait
-php artisan db:seed --class=TodoGroupSeeder ${FORCE} & wait
 
-exec "php-fpm" -g /var/run/php-fpm.pid
+php-fpm -g /var/run/php-fpm.pid
+if [ $ENV == 'local' ]; then
+  exec "nginx" -g "daemon on;"
+else
+  exec "nginx" -g "daemon off;"
+fi
