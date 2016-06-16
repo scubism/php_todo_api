@@ -1,4 +1,4 @@
-FROM scubism/php7-nginx:0.3
+FROM scubism/php7-nginx:0.5
 
 WORKDIR /var/www/api
 
