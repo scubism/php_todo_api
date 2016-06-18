@@ -57,7 +57,7 @@ chown -R nginx:nginx /var/www/api
 chmod 777 -R /var/www/api/storage
 
 composer dump-autoload
-/usr/local/bin/dockerize --wait tcp://${DB_HOST}:${DB_PORT} && php artisan migrate ${FORCE} & wait
+/usr/local/bin/dockerize --wait tcp://${DB_HOST}:${DB_PORT} -timeout 60s && php artisan migrate ${FORCE} & wait
 
 php-fpm -g /var/run/php-fpm.pid
 if [ $ENV == 'local' ]; then
