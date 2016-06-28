@@ -69,7 +69,7 @@ class TodosController extends Controller
     public function createTodo(Request $request)
     {
         $this->validate($request, [
-            'title' => 'required'
+            'title' => 'required|max:16'
         ]);
 
         $data = [
@@ -99,7 +99,7 @@ class TodosController extends Controller
     public function updateTodo($id, Request $request)
     {
         $this->validate($request, [
-            'title' => 'required'
+            'title' => 'required|max:16'
         ]);
 
         $data = [

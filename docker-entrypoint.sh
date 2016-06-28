@@ -5,25 +5,27 @@ ENV=${APP_ENV:-'local'}
 RANDOM_KEY=`< /dev/urandom tr -dc A-Za-z0-9 | head -c${1:-32};echo;`
 FORCE=''
 
-if [ -f "/var/run/php-fpm.pid" ]; then
-  pid=`cat /var/run/php-fpm.pid`
-  if [ ! -z ${pid} ]; then
-    echo "PHP-FPM is running. Killing pid ${pid}"
-    kill -QUIT ${pid}
-    echo "" > /var/run/php-fpm.pid
-  fi
-fi
-
-if [ -f "/var/run/nginx.pid" ]; then
-  pid=`cat /var/run/nginx.pid`
-  if [ ! -z ${pid} ]; then
-    echo "Nginx is running. Killing pid ${pid}"
-    kill -QUIT ${pid}
-    echo "" > /var/run/nginx.pid
-  fi
-fi
-
 if [ $ENV == 'local' ]; then
+  # Kill Nginx & PHP-FPM only in development mode
+  if [ -f "/var/run/php-fpm.pid" ]; then
+    pid=`cat /var/run/php-fpm.pid`
+    if [ ! -z ${pid} ]; then
+      echo "PHP-FPM is running. Killing pid ${pid}"
+      kill -QUIT ${pid}
+      echo "" > /var/run/php-fpm.pid
+    fi
+  fi
+
+  if [ -f "/var/run/nginx.pid" ]; then
+    pid=`cat /var/run/nginx.pid`
+    if [ ! -z ${pid} ]; then
+      echo "Nginx is running. Killing pid ${pid}"
+      kill -QUIT ${pid}
+      echo "" > /var/run/nginx.pid
+    fi
+  fi
+
+  # Set APP DEBUG
   APP_DEBUG=true
   composer install # For install dev packages
   if [ -L "/var/log/nginx/access.log" ]; then
