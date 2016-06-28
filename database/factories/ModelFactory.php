@@ -13,7 +13,7 @@
 
 $factory->define(App\DataAccess\Eloquent\Todo::class, function ($faker) {
     return [
-        'title' => $faker->sentence(4, true),
+        'title' => $faker->firstNameMale(),
         'color' => $faker->hexcolor,
         'todo_groups_id' => 1
     ];

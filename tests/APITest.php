@@ -95,10 +95,23 @@ class APITest extends TestCase {
         $this->assertEquals('application/json', $this->response->headers->get('Content-Type'));
     }
 
-    public function testUpdateTodoSuccess()
+    public function testUpdateTodoWithLongTitle()
     {
         factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
         $title = 'Test Todo 1 Updated';
+        $this->json('PUT', '/v1/todos/1', [
+                'title' => $title
+            ])
+            ->seeJson([
+                'message' => 'The title may not be greater than 16 characters.'
+            ]);
+        $this->assertEquals(400, $this->response->getStatusCode());
+    }
+
+    public function testUpdateTodoSuccess()
+    {
+        factory(App\DataAccess\Eloquent\Todo::class, APITest::DEFAULT_TODO_NUMBER)->create();
+        $title = 'Test Todo xxx';
         $this->json('PUT', '/v1/todos/1', [
                 'title' => $title
             ])
